@@ -17,5 +17,8 @@
     "chalk": "^2.4.1",
     "commander": "^2.19.0",
     "inquirer": "^6.2.0"
+  },
+  "devDependencies": {
+    "ora": "^3.0.0"
   }
 }
