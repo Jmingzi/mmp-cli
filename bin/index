@@ -1,0 +1,52 @@
+#!/usr/bin/env node
+
+const { print } = require('../lib/utils/output.js')
+const chalk = require('chalk')
+const inquirer = require('inquirer')
+
+const program = require('commander')
+const pkg = require('../package.json')
+
+program
+  .version(require('../package').version)
+  .usage('<command> [options]')
+
+
+program
+  .command('ci [branch]')
+  .usage('<command> [branch]')
+  .description('处理提交记录，分支为master、develop和当前的开发分支')
+  // .option('-b, --branch', '目标分支名称')
+  // .option('-m, --mode', '运行模式，有2种: default和silent')
+  .action((branch, cmd) => {
+    if (!branch) {
+      cmd.help()
+    } else {
+      // if (isCmd(mode)) {
+      //   mode = 'default'
+      // }
+      require('../lib/commit.js')(branch)
+    }
+  })
+
+// output help information on unknown commands
+program
+  .arguments('<command>')
+  .action((cmd) => {
+    program.outputHelp()
+    console.log(`  ` + chalk.red(`未知命令 ${chalk.yellow(cmd)}.`))
+    console.log()
+  })
+
+// console.log(program.help)
+program.parse(process.argv)
+
+if (!process.argv.slice(2).length) {
+  print()(
+      '   mmp消灭键盘侠，使用mmp -h查看更多'
+  )
+}
+
+function isCmd(cmd) {
+  return cmd.commands
+}
