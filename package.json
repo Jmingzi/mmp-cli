@@ -19,6 +19,7 @@
     "inquirer": "^6.2.0"
   },
   "devDependencies": {
+    "bluebird": "^3.5.2",
     "ora": "^3.0.0"
   }
 }
