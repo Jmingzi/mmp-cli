@@ -13,15 +13,10 @@ program
   .command('ci [branch]')
   .usage('<command> [branch]')
   .description('处理提交记录，分支为master、develop和当前的开发分支')
-  // .option('-b, --branch', '目标分支名称')
-  // .option('-m, --mode', '运行模式，有2种: default和silent')
   .action((branch, cmd) => {
     if (!branch) {
       cmd.help()
     } else {
-      // if (isCmd(mode)) {
-      //   mode = 'default'
-      // }
       require('../lib/commit.js')(branch)
     }
   })
@@ -35,7 +30,6 @@ program
     console.log()
   })
 
-// console.log(program.help)
 program.parse(process.argv)
 
 if (!process.argv.slice(2).length) {
@@ -44,6 +38,6 @@ if (!process.argv.slice(2).length) {
   )
 }
 
-function isCmd(cmd) {
-  return cmd.commands
-}
+// function isCmd(cmd) {
+//   return cmd.commands
+// }
