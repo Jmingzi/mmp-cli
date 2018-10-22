@@ -2,10 +2,7 @@
 
 const { print } = require('../lib/utils/output.js')
 const chalk = require('chalk')
-const inquirer = require('inquirer')
-
 const program = require('commander')
-const pkg = require('../package.json')
 
 program
   .version(require('../package').version)
