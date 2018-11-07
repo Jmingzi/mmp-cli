@@ -13,11 +13,12 @@ program
   .usage('<command> [branch]')
   .description('处理提交记录，分支为master、develop和当前的开发分支')
   .action((branch, cmd) => {
-    if (!branch) {
-      cmd.help()
-    } else {
-      require('../lib/commit.js')(branch)
-    }
+    require('../lib/commit.js')(branch)
+    // if (!branch) {
+    //   cmd.help()
+    // } else {
+    //
+    // }
   })
 
 // output help information on unknown commands
