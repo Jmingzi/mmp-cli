@@ -4,9 +4,25 @@ const { print } = require('../lib/utils/output.js')
 const chalk = require('chalk')
 const program = require('commander')
 
+// program
+//   .version(require('../package').version)
+//   .usage('<command> [options]')
+
 program
-  .version(require('../package').version)
-  .usage('<command> [options]')
+    .command('init')
+    .usage('<command>')
+    .description('配置初始化，命令配置只支持package.json中存在的')
+    .action(() => {
+      require('../lib/init.js')()
+    })
+
+program
+    .command('build')
+    .usage('<command>')
+    .description('在master、develop分支上打包并提交')
+    .action(() => {
+      require('../lib/build.js')()
+    })
 
 program
   .command('ci [branch]')
