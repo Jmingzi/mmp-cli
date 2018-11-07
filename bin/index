@@ -41,7 +41,7 @@ program.parse(process.argv)
 
 if (!process.argv.slice(2).length) {
   print()(
-      '   mmp消灭键盘侠，使用mmp -h查看更多'
+      '   mmp git快捷工具，使用mmp -h查看更多'
   )
 }
 
