@@ -14,12 +14,19 @@ program
   .description('处理提交记录，分支为master、develop和当前的开发分支')
   .action((branch, cmd) => {
     require('../lib/commit.js')(branch)
-    // if (!branch) {
-    //   cmd.help()
-    // } else {
-    //
-    // }
   })
+
+program
+    .command('cp [commit_id] [branch]')
+    .usage('<command> [commit_id] [branch]')
+    .description('cherry-pick 到目标分支，只能pick最近10条提交')
+    .action((commit_id, branch, cmd) => {
+      if (commit_id && branch) {
+        require('../lib/commit.js')(branch, commit_id)
+      } else {
+        cmd.help()
+      }
+    })
 
 // output help information on unknown commands
 program
