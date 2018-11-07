@@ -11,7 +11,7 @@ program
 program
   .command('ci [branch]')
   .usage('<command> [branch]')
-  .description('处理提交记录，分支为master、develop和当前的开发分支')
+  .description('一键处理提交')
   .action((branch, cmd) => {
     require('../lib/commit.js')(branch)
   })
