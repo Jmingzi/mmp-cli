@@ -5,7 +5,7 @@ git 工作流快捷工具
 
 ## 安装
 ```shell
-npm install mmp-cli -D
+npm install mmp-cli -g
 ```
 
 ## 介绍
