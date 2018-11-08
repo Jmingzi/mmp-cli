@@ -38,5 +38,7 @@ cherry-pick 某个提交到master或develop，参数必填。cherry-pick完成�
 
 ## 待完成
 
-- ![ ] 将主分支作为可配项，默认为master和develop
+- [ ] 将主分支作为可配项，默认为master和develop
+- [ ] 校验当前命令是否在项目根目录下执行
+
 
