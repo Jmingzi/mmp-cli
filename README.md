@@ -1,6 +1,8 @@
 # mmp-cli
 git 工作流快捷工具
 
+> Node v10.8.0
+
 ## 安装
 ```shell
 npm install mmp-cli -D
