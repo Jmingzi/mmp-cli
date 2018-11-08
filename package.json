@@ -1,27 +1,24 @@
 {
-  "name": "mmp",
-  "version": "1.0.0",
-  "description": "",
+  "name": "mmp-cli",
+  "version": "1.0.1",
+  "description": "git 快捷工具",
   "main": "bin/index",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node ./bin/index",
-    "dev": "npm run dev",
-    "build": "npm run build1"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bin": {
     "mmp": "./bin/index"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["git", "cli"],
+  "author": "jmingzi",
   "license": "ISC",
   "dependencies": {
     "chalk": "^2.4.1",
     "commander": "^2.19.0",
-    "inquirer": "^6.2.0"
-  },
-  "devDependencies": {
+    "inquirer": "^6.2.0",
     "bluebird": "^3.5.2",
     "ora": "^3.0.0"
+  },
+  "devDependencies": {
   }
 }
