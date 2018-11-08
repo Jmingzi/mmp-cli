@@ -24,7 +24,7 @@ program
     .usage('<command>')
     .description('在master、develop分支上打包并提交')
     .action(() => {
-      check(() => {
+      check().then(() => {
         require('../lib/build.js')()
       })
     })
@@ -34,7 +34,7 @@ program
   .usage('<command> [branch]')
   .description('一键处理提交')
   .action((branch) => {
-    check(() => {
+    check().then(() => {
       require('../lib/commit.js')(branch)
     })
   })
@@ -45,7 +45,7 @@ program
     .description('cherry-pick 到目标分支，只能pick最近10条提交')
     .action((commit_id, branch, cmd) => {
       if (commit_id && branch) {
-        check(() => {
+        check().then(() => {
           require('../lib/commit.js')(branch, commit_id)
         })
       } else {
