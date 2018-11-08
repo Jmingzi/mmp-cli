@@ -3,17 +3,20 @@
 const { print } = require('../lib/utils/output.js')
 const chalk = require('chalk')
 const program = require('commander')
+const check = require('../lib/checkVersion')
 
-// program
-//   .version(require('../package').version)
-//   .usage('<command> [options]')
+program
+  .version(require('../package').version)
+  .usage('<command> [options]')
 
 program
     .command('init')
     .usage('<command>')
     .description('配置初始化，命令配置只支持package.json中存在的')
     .action(() => {
-      require('../lib/init.js')()
+      check().then(() => {
+        require('../lib/init.js')()
+      })
     })
 
 program
@@ -21,15 +24,19 @@ program
     .usage('<command>')
     .description('在master、develop分支上打包并提交')
     .action(() => {
-      require('../lib/build.js')()
+      check(() => {
+        require('../lib/build.js')()
+      })
     })
 
 program
   .command('ci [branch]')
   .usage('<command> [branch]')
   .description('一键处理提交')
-  .action((branch, cmd) => {
-    require('../lib/commit.js')(branch)
+  .action((branch) => {
+    check(() => {
+      require('../lib/commit.js')(branch)
+    })
   })
 
 program
@@ -38,7 +45,9 @@ program
     .description('cherry-pick 到目标分支，只能pick最近10条提交')
     .action((commit_id, branch, cmd) => {
       if (commit_id && branch) {
-        require('../lib/commit.js')(branch, commit_id)
+        check(() => {
+          require('../lib/commit.js')(branch, commit_id)
+        })
       } else {
         cmd.help()
       }
@@ -57,10 +66,7 @@ program.parse(process.argv)
 
 if (!process.argv.slice(2).length) {
   print()(
-      '   mmp git快捷工具，使用mmp -h查看更多'
+      '   mmp git工作流快捷工具，使用mmp -h查看更多'
   )
 }
 
-// function isCmd(cmd) {
-//   return cmd.commands
-// }
