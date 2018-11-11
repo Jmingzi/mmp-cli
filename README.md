@@ -12,19 +12,24 @@ npm install mmp-cli -g
 
 ![1](./intro.png)
 
-场景举例
+### 场景举例
 
-我们在开发分支开发功能，开发完需要提交到测试环境，目前的流程为：add -> commit -> checkout -> cherry-pick(或merge) -> build -> add -> commit -> push
+我们在开发分支开发功能，开发完需要提交到测试环境，目前的流程为
+```
+add -> commit -> checkout -> cherry-pick(或merge) -> build -> add -> commit -> push
+```
 
 而使用mmp，只需`mmp ci develop`一步
 
-适配的工作流如下
+### 适配的工作流如下
 
 - 开发分支是从master上拉取的，后续所有在开发分支上的改动，都以cherry-pick的形式到master或develop（rebase -i）
 
 - 开发分支不做打包，打包都在master或develop上进行，开发的commit和打包的commit需要分开，以便减少`revert`时的冲突
 
 - 开发分支不push到远程，提交的message需要区分打包和正常的修改提交，且备注分支名称，便于后期查找
+
+- commit message 一定要备注功能或日常分支名称，并注明改动内容，以方便提取或回滚相应改动
 
 ## 使用
 
