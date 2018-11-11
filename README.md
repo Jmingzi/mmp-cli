@@ -19,7 +19,10 @@ npm install mmp-cli -g
 add -> commit -> checkout -> cherry-pick(或merge) -> build -> add -> commit -> push
 ```
 
-而使用mmp，只需`mmp ci develop`一步
+而使用mmp，只需一步
+```
+mmp ci develop
+```
 
 ### 适配的工作流如下
 
