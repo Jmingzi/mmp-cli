@@ -1,6 +1,6 @@
 {
   "name": "mmp-cli",
-  "version": "1.0.24",
+  "version": "1.0.25",
   "description": "git 工作流快捷工具",
   "main": "bin/index",
   "scripts": {
