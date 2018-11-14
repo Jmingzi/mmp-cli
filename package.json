@@ -1,12 +1,13 @@
 {
   "name": "mmp-cli",
-  "version": "1.0.25",
+  "version": "1.0.26",
   "description": "git 工作流快捷工具",
   "main": "bin/index",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "npm run dev",
-    "build": "npm run build"
+    "build": "npm run build",
+    "online": "npm run oneline"
   },
   "bin": {
     "mmp": "./bin/index"
