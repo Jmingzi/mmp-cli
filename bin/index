@@ -25,7 +25,7 @@ program
     .description('在master、develop分支上打包并提交')
     .action(() => {
       check().then(() => {
-        require('../lib/build.js')('command')
+        require('../lib/build.js')()
       })
     })
 
