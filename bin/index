@@ -10,24 +10,34 @@ program
   .usage('<command> [options]')
 
 program
-    .command('init')
-    .usage('<command>')
-    .description('配置初始化，命令配置只支持package.json中存在的')
-    .action(() => {
-      check().then(() => {
-        require('../lib/init.js')()
-      })
+  .command('init')
+  .usage('<command>')
+  .description('配置初始化，命令配置只支持package.json中存在的')
+  .action(() => {
+    check().then(() => {
+      require('../lib/init.js')()
     })
+  })
 
 program
-    .command('build')
-    .usage('<command>')
-    .description('在master、develop分支上打包并提交')
-    .action(() => {
-      check().then(() => {
-        require('../lib/build.js')()
-      })
+  .command('build')
+  .usage('<command>')
+  .description('在master、develop分支上打包并提交')
+  .action(() => {
+    check().then(() => {
+      require('../lib/build.js')()
     })
+  })
+
+program
+  .command('ls')
+  .usage('<command>')
+  .description('列出当前配置')
+  .action(() => {
+    check().then(() => {
+      require('../lib/ls.js')()
+    })
+  })
 
 program
   .command('ci [branch]')
@@ -40,18 +50,18 @@ program
   })
 
 program
-    .command('cp [commit_id] [branch]')
-    .usage('<command> [commit_id] [branch]')
-    .description('cherry-pick 到目标分支，只能pick最近10条提交')
-    .action((commit_id, branch, cmd) => {
-      if (commit_id && branch) {
-        check().then(() => {
-          require('../lib/commit.js')(branch, commit_id)
-        })
-      } else {
-        cmd.help()
-      }
-    })
+  .command('cp [commit_id] [branch]')
+  .usage('<command> [commit_id] [branch]')
+  .description('cherry-pick 到目标分支，只能pick最近10条提交')
+  .action((commit_id, branch, cmd) => {
+    if (commit_id && branch) {
+      check().then(() => {
+        require('../lib/commit.js')(branch, commit_id)
+      })
+    } else {
+      cmd.help()
+    }
+  })
 
 // output help information on unknown commands
 program
@@ -66,7 +76,7 @@ program.parse(process.argv)
 
 if (!process.argv.slice(2).length) {
   print()(
-      '   mmp git工作流快捷工具，使用mmp -h查看更多'
+    '   mmp git工作流快捷工具，使用mmp -h查看更多'
   )
 }
 
