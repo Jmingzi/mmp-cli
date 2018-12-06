@@ -34,7 +34,7 @@ mmp ci develop
 
 - commit message 一定要备注功能或日常分支名称，并注明改动内容，以方便提取或回滚相应改动
 
-## 使用
+## API
 
 #### `mmp ci [branch]`
 
@@ -44,9 +44,18 @@ mmp ci develop
 
 cherry-pick 某个提交到master或develop，参数必填。cherry-pick完成后，会根据用户选择是否需要打包继续完成上述流程。
 
+#### `mmp ls`
+
+列出当前项目的本地配置
+
 #### `mmp init`
 
-初始化master或develop打包命令，由于无法检测命令的有效性，所以目前只是同步package.json中的scripts命令。
+初始化主分支的打包命令，master和develop是必须的，其它自定义；
+
+定义的命令可以是任意shell命令，例如
+```
+cd xx && npm run build && cd ../
+```
 
 #### `mmp build`
 
