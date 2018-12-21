@@ -8,9 +8,23 @@ git 工作流快捷工具
 npm install mmp-cli -g
 ```
 
-## 介绍
+## 快速使用
 
-![1](./intro.png)
+```shell
+npx mmp -h
+
+# 初始化
+npx mmp init
+
+# 提交
+npx mmp ci
+
+# 在开发分支提交到主分支
+npx mmp ci develop
+
+# 打包
+npx mmp build
+```
 
 ### 场景举例
 
