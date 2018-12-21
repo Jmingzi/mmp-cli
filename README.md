@@ -1,7 +1,7 @@
 # mmp-cli
 git 工作流快捷工具
 
-> Node v10.8.0
+> 开发环境 Node v10.8.0，本地保证10或以上即可，nvm use 10.0.0。
 
 ## 安装
 ```shell
