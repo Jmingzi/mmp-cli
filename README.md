@@ -11,19 +11,19 @@ npm install mmp-cli -g
 ## 快速使用
 
 ```shell
-npx mmp -h
+npx mmp-cli -h
 
 # 初始化
-npx mmp init
+npx mmp-cli init
 
 # 提交
-npx mmp ci
+npx mmp-cli ci
 
 # 在开发分支提交到主分支
-npx mmp ci develop
+npx mmp-cli ci develop
 
 # 打包
-npx mmp build
+npx mmp-cli build
 ```
 
 ### 场景举例
