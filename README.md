@@ -74,3 +74,10 @@ cd xx && npm run build && cd ../
 #### `mmp build`
 
 打包当前分支并提交
+
+#### `mmp set [branch_cmd]`
+```
+mmp set master='npm run build'
+```
+
+单独设置主分支命令

@@ -63,6 +63,27 @@ program
     }
   })
 
+program
+  .command('set [branch_cmd]')
+  .usage('<command>')
+  .description('设置单项配置')
+  .action((branch_cmd, cmd) => {
+    if (branch_cmd && /=/.test(branch_cmd)) {
+      const arr = branch_cmd.split('=')
+      if (arr.length !== 2) {
+        cmd.help()
+        process.exit(1)
+      }
+      // if (/ /.test(arr[1]) && /^`$/.test(arr[1]))
+      check().then(() => {
+        require('../lib/setConfig.js')(arr[0], arr[1])
+      })
+    } else {
+      cmd.help()
+    }
+
+  })
+
 // output help information on unknown commands
 program
   .arguments('<command>')
