@@ -66,7 +66,7 @@ program
 program
   .command('set [branch_cmd]')
   .usage('<command>')
-  .description('设置单项配置')
+  .description('设置单项配置 set master="npm run build"')
   .action((branch_cmd, cmd) => {
     if (branch_cmd && /=/.test(branch_cmd)) {
       const arr = branch_cmd.split('=')
@@ -76,12 +76,25 @@ program
       }
       // if (/ /.test(arr[1]) && /^`$/.test(arr[1]))
       check().then(() => {
-        require('../lib/setConfig.js')(arr[0], arr[1])
+        require('../lib/setConfig.js').setBrCmd(arr[0], arr[1])
       })
     } else {
       cmd.help()
     }
+  })
 
+program
+  .command('add [branch]')
+  .usage('<command>')
+  .description('新增主分支')
+  .action((branch, cmd) => {
+    if (branch) {
+      check().then(() => {
+        require('../lib/setConfig.js').addBr(branch)
+      })
+    } else {
+      cmd.help()
+    }
   })
 
 // output help information on unknown commands

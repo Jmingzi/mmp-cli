@@ -81,3 +81,10 @@ mmp set master='npm run build'
 ```
 
 单独设置主分支命令
+
+#### `mmp add [branch]`
+```
+mmp add yueka-master
+```
+
+新增主分支
