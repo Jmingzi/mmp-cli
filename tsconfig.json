@@ -1,15 +1,19 @@
 {
   "compilerOptions": {
     "module": "commonjs",
-    "moduleResolution": "Node",
-    "target": "es5",
+    "target": "esnext",
     "noImplicitAny": true,
     "removeComments": true,
     "preserveConstEnums": true,
     "sourceMap": false,
     "strictNullChecks": true,
     "declaration": false,
-    "lib": ["es5", "es6", "es7", "esnext", "dom"],
+    "lib": [
+      "es5",
+      "es6",
+      "es7",
+      "esnext"
+    ],
     "outDir": "./lib-dist"
   },
   "include": [
