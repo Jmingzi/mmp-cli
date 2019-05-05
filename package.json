@@ -5,9 +5,9 @@
   "main": "bin/index",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "npm run dev",
-    "build": "npm run build",
-    "online": "npm run oneline"
+    "dev": "npm run lint && tsc -w",
+    "build": "npm run lint && tsc",
+    "lint": "eslint ./src --ext .ts --fix"
   },
   "bin": {
     "mmp": "./bin/index"
@@ -15,6 +15,12 @@
   "keywords": [
     "git",
     "cli"
+  ],
+  "files": [
+    "lib",
+    "lib-dist",
+    "bin",
+    "types"
   ],
   "author": "jmingzi",
   "license": "ISC",
@@ -28,5 +34,14 @@
     "inquirer": "^6.2.0",
     "ora": "^3.0.0"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@types/node": "^12.0.0",
+    "eslint": "^5.16.0",
+    "eslint-config-standard": "^12.0.0",
+    "eslint-plugin-import": "^2.17.2",
+    "eslint-plugin-node": "^9.0.1",
+    "eslint-plugin-promise": "^4.1.1",
+    "eslint-plugin-standard": "^4.0.0",
+    "typescript": "^3.4.5"
+  }
 }
