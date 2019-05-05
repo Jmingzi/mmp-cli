@@ -1,31 +1,25 @@
 const http = require('https')
 const semver = require('semver')
-const { runCmd } = require('./utils/util')
-const boxen = require('boxen')
-const colors = require('colors/safe')
-// const { getCache, setCache } = require('./utils/cache')
 const Ora = require('ora')
+// const { getCache, setCache } = require('./utils/cache')
+const { runCmd, noticeUpdate } = require('./utils/util')
 const spinner = new Ora()
-
-// 提示参考 https://github.com/KohPoll/pkg-updater/blob/master/lib/index.js
-function noticeUpdate(current: string, latest: string) {
-	const msg = 'mmp-cli有更新的版本可以使用: \n' +
-		`${colors.dim(current)} -> ${colors.green(latest)}\n` +
-		`运行 ${colors.cyan('npm update mmp-cli -g')} 更新.`
-
-	console.log(boxen(msg, {
-		padding: 1,
-		margin: 1,
-		borderColor: 'yellow',
-		borderStyle: 'classic'
-	}))
-}
 
 // function setCheckTs(cache: any) {
 // 	setCache({ ...cache, lastCheckTs: Date.now() })
 // }
 
-module.exports = async () => {
+export const checkNode = async () => {
+	spinner.start('校验 node 版本')
+	const result = await runCmd('node -v')
+	const ok = semver.gte(result.substring(1), '10.0.0')
+	if (!ok) {
+		spinner.fail('node 版本必须大于 v10.0.0')
+		process.exit(0)
+	}
+}
+
+export const check = async () => {
 	// const cache = await getCache()
 	// if (
 	// 	cache.lastCheckTs &&
@@ -34,7 +28,11 @@ module.exports = async () => {
 	// 	// 1 小时只更新一次
 	// 	return Promise.resolve()
 	// }
-	spinner.start('校验版本')
+
+	// 检查 Node 版本 v10.0.0
+	await checkNode()
+
+	spinner.start('校验 mmp 版本')
 	return new Promise((resolve, reject) => {
 		http.get('https://registry.npm.taobao.org/mmp-cli/latest', (res: any) => {
 			res.setEncoding('utf8')
@@ -49,28 +47,18 @@ module.exports = async () => {
 			res.on('end', async () => {
 				try {
 					const parsedData = JSON.parse(rawData)
-					let localVersion = await runCmd('mmp -V').catch(() => {
-						noticeUpdate(`v1.0.0`, `v${parsedData.version}`)
-						// setCheckTs(cache)
-						resolve()
-					})
-					localVersion = localVersion.toString().trim()
+					const localVersion = await runCmd('mmp -V')
+
 					if (semver.lt(localVersion, parsedData.version)) {
-						noticeUpdate(localVersion, parsedData.version)
+						noticeUpdate(localVersion.trim(), parsedData.version)
 					}
 					// setCheckTs(cache)
 					resolve()
 				} catch (e) {
-					console.error(e.message)
+					// console.error(e.message)
 					reject(e)
 				}
 			})
 		})
 	})
 }
-
-exports.checkNode = async () => {
-
-}
-
-export {}

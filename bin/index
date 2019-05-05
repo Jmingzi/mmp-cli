@@ -3,7 +3,8 @@
 const { print } = require('../lib/utils/output.js')
 const chalk = require('chalk')
 const program = require('commander')
-const check = require('../lib/checkVersion')
+// const check = require('../lib/checkVersion')
+const { check } = require('../lib-dist/check-version')
 
 program
   .version(require('../package').version)
@@ -45,7 +46,7 @@ program
   .description('一键处理提交')
   .action((branch) => {
     check().then(() => {
-      require('../lib/commit.js')(branch)
+      require('../lib-dist/commit.js')(branch)
     })
   })
 
