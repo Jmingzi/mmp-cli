@@ -42,5 +42,7 @@ export = {
       borderColor: 'yellow',
       borderStyle: 'classic'
     }))
-  }
+  },
+
+  configPath: `${process.env.HOME}/.mmprc`
 }
