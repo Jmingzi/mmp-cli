@@ -1,7 +1,11 @@
+const fs = require('fs')
 const util = require('util')
+const path = require('path')
 const childProcess = require('child_process')
 const boxen = require('boxen')
 const colors = require('colors/safe')
+
+const cmdConstant = require('./cmdConstant')
 
 interface Api {
   [x: string]: any
@@ -18,7 +22,9 @@ const asyncApi = promisify([
   childProcess.exec
 ])
 
-export = {
+const self = {
+  configPath: `${process.env.HOME}/.mmprc`,
+
   ...asyncApi,
 
   runCmd: async (cmd: string | string[]) => {
@@ -44,5 +50,32 @@ export = {
     }))
   },
 
-  configPath: `${process.env.HOME}/.mmprc`
+  getPathDir (path: string = process.cwd(), index: number = 0): string {
+    const arr = path.split('/')
+    return arr[arr.length - 1 + index]
+  },
+
+  isRoot: (p: string): boolean => fs.existsSync(path.join(p, 'package.json')),
+
+  getProjectRoot (): string {
+    const cwd = process.cwd()
+    if (self.isRoot(cwd)) {
+      return self.getPathDir()
+    } else {
+      // 向上查找
+      let result = ''
+      let remain = cwd
+      const pathItem = cwd.split('/')
+      while (!result && remain !== process.env.HOME) {
+        pathItem.pop()
+        remain = pathItem.join('/')
+        if (self.isRoot(remain)) {
+          result = self.getPathDir(remain)
+        }
+      }
+      return result
+    }
+  }
 }
+
+export = self

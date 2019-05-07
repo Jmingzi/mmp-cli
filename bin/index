@@ -47,6 +47,7 @@ program
   .action((branch) => {
     check().then(() => {
       require('../lib-dist/commit.js')(branch)
+      // require('../lib/commit.js')(branch)
     })
   })
 

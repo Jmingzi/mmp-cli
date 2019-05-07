@@ -52,3 +52,7 @@ export const setProjectScript = (
   }
   setCache(fullObj)
 }
+
+export const getScriptField = (fullObj: Config, project: string) => {
+  return (field: string) => fullObj && fullObj.script[project] ? fullObj.script[project][field] : null
+}

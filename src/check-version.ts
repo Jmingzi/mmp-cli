@@ -25,12 +25,9 @@ export const check = async (): Promise<void> => {
   	cache.lastCheckTs &&
   	Date.now() - cache.lastCheckTs <= 60 * 60 * 1000
   ) {
-  	// 1 小时只更新一次
     console.log(colors.grey('\n   版本更新校验缓存 1 小时\n'))
   	return Promise.resolve()
   }
-
-  // 检查 Node 版本 v10.0.0
   await checkNode()
 
   spinner.start('校验 mmp 版本')
