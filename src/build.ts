@@ -34,12 +34,14 @@ const build = async (buildImmediate?: boolean) => {
   await buildScript(buildCmd)
 
   const hasChanges = await hasStaged()
+  spinner.start('提交打包结果')
   if (hasChanges) {
     await runCmd([
       cmd.GIT_ADD,
       cmd.gitCi('build', '打包', currentBr),
       cmd.GIT_PUSH
     ])
+    spinner.succeed('提交打包结果成功')
   } else {
     spinner.info('📦 打包后无可提交信息')
   }

@@ -139,4 +139,5 @@ async function pushCommit (
     }
     await push()
   }
+  process.exit(0)
 }
