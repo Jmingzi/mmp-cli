@@ -4,7 +4,7 @@ const prompt = require('inquirer').createPromptModule()
 
 const { getProjectRoot, runCmd } = require('./utils/util')
 const { getCache, getScriptField, setProjectScript } = require('./utils/cache')
-const { getCommitIdLog, getBr, hasStaged, getCurrentBr, pull, push, cherryPickCommit } = require('./utils/git')
+const { getCommitIdLog, getBr, hasStaged, getCurrentBr, pull, push, cherryPickCommit, checkout } = require('./utils/git')
 const cmd = require('./utils/cmd-constant')
 const config = require('./config')
 const build = require('./build')
@@ -124,16 +124,14 @@ async function pushCommit (
 ): Promise<void> {
   if (isNeedCheckout) {
     // checkout pull cherry-pick build commit push checkout
-    await cherryPickCommit(targetBranch, commitId)
-
+    await checkout(targetBranch)
+    await pull()
+    await cherryPickCommit(commitId)
     if (isNeedBuild) {
       await build()
     }
-
     await push()
-    spinner.start(`切回 ${currentBranch} 分支`)
-    await runCmd(cmd.gitCo(currentBranch))
-    spinner.succeed(`切回 ${currentBranch} 分支成功`)
+    await checkout(currentBranch)
   } else {
     await pull()
     if (isNeedBuild) {

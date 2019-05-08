@@ -47,11 +47,11 @@ export const push = async () => {
   spinner.succeed('推送成功')
 }
 
-export const cherryPickCommit = async (targetBranch: string, commitId: string) => {
+export const cherryPickCommit = async (commitId: string) => {
   spinner.start(`cherry-pick ${commitId}`)
   try {
-    await runCmd(cmdConstant.gitCo(targetBranch))
-    await pull()
+    // await runCmd(cmdConstant.gitCo(targetBranch))
+    // await pull()
     await runCmd(cmdConstant.gitCp(commitId))
   } catch (e) {
     console.log('\n' + e)
@@ -59,4 +59,10 @@ export const cherryPickCommit = async (targetBranch: string, commitId: string) =
     process.exit(0)
   }
   spinner.succeed(`cherry-pick 完成`)
+}
+
+export const checkout = async (branch: string) => {
+  spinner.start(`切换到 ${branch} 分支`)
+  await runCmd(cmdConstant.gitCo(branch))
+  spinner.succeed(`切换到 ${branch} 分支成功`)
 }
