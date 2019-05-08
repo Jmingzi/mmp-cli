@@ -27,9 +27,13 @@ export const getCurrentBr = async (): Promise<string> => {
 }
 
 export const pull = async (isRebase: boolean = true) => {
-  const cmd = isRebase ? cmdConstant.GET_PULL_REBASE : cmdConstant.GIT_PULL
+  const cmd = isRebase ? cmdConstant.GIT_PULL_REBASE : cmdConstant.GIT_PULL
   spinner.start(`拉取远程 ${cmd}`)
-  await runCmd(cmd)
+  await runCmd(cmd).catch((err: Error) => {
+    console.log('\n' + err)
+    spinner.fail(`拉取失败`)
+    process.exit(0)
+  })
   spinner.succeed('拉取成功')
 }
 
