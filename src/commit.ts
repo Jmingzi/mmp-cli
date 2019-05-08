@@ -3,61 +3,58 @@ const prompt = require('inquirer').createPromptModule()
 
 const { getProjectRoot, runCmd } = require('./utils/util')
 const { getCache, getScriptField, setProjectScript } = require('./utils/cache')
-const { getCommitIdLog, getBr, hasStaged } = require('./utils/git')
+const { getCommitIdLog, getBr, hasStaged, getCurrentBr, pull, push, cherryPickCommit } = require('./utils/git')
 const cmd = require('./utils/cmdConstant')
 const config = require('./config')
 const spinner = new Ora()
 
-export const commit = async (branch: string) => {
-  let currentBr: string = ''
-  let isNeedBuild: boolean = false
+async function isBranchExist (branch: string): Promise<void> {
+  // 检查branch是否存在
+  const brArr = await getBr()
+  if (!brArr.includes(branch)) {
+    spinner.fail(`分支${branch}不存在`)
+    process.exit(0)
+  }
+}
 
+async function pushCommit (
+  isNeedBuild: boolean,
+  currentBranch: string,
+  targetBranch?: string,
+  commitId?: string
+): Promise<void> {
+  if (targetBranch && currentBranch !== targetBranch) {
+    await cherryPickCommit(targetBranch, commitId)
+  } else {
+    await pull()
+  }
+
+  if (isNeedBuild) {
+    console.log('build')
+  }
+
+  await push()
+}
+
+export const commit = async (branch?: string) => {
   const project = getProjectRoot()
   const cache = getCache()
   const getField = getScriptField(cache, project)
 
   if (branch) {
     // 检查branch是否存在
-    const brArr = await getBr()
-    if (!brArr.includes(branch)) {
-      spinner.fail(`分支${branch}不存在`)
-      process.exit(0)
-    }
-  } else {
-    currentBr = await runCmd(cmd.GIT_HEAD)
-    currentBr = currentBr.trim()
+    await isBranchExist(branch)
   }
 
   // 检查是否存在可提交信息
   const hasChanges = await hasStaged()
-  // if (branch && commitId) {
-  //   // cherry-pick commit_id
-  //   if (hasChanges) {
-  //     // 判断是否存在未提交的修改
-  //     spinner.info(`当前工作区存在修改未提交，使用 git status 查看`)
-  //     process.exit(0)
-  //   }
-  //
-  //   if (branch === currentBr) {
-  //     spinner.info('cherry-pick 不能在同一个分支上进行')
-  //     process.exit(0)
-  //   }
-  //
-  //   // 判断commitId是否存在
-  //   const idArr = await getCommitIdLog()
-  //   if (!idArr.includes(commitId)) {
-  //     spinner.fail(`cherry-pick [${commitId}] 不存在`)
-  //     process.exit(0)
-  //   }
-  //
-  //   // await doWidthBr(branch, currentBr, commitId, isNeedBuild, mainBrList)
-  // } else
   if (!hasChanges) {
     // commit stage
     spinner.info('当前工作区没有可提交修改')
     process.exit(0)
   }
 
+  const currentBr: string = await getCurrentBr()
   // 提交当前工作区
   const { ciType } = await prompt({ ...config.ciType, default: getField('ciType') })
   const { ciMessage } = await prompt({ ...config.ciMessage, default: getField('ciMessage') })
@@ -70,7 +67,7 @@ export const commit = async (branch: string) => {
   spinner.succeed(`提交完成[${commitResult[1]}]\n  ${commitMessageCommand.match(/"(.*)"/)[1]}`)
 
   const mainBrList = getField('mainBrList')
-  // 询问是否需要打包
+  let isNeedBuild: boolean = false
   if (mainBrList.includes(branch || currentBr)) {
     // 目标分支存在且为主分支
     // 目标分支不存在，当前分支为主分支
@@ -78,17 +75,21 @@ export const commit = async (branch: string) => {
     isNeedBuild = buildQuaRes.isNeedBuild
   }
 
+  await pushCommit(isNeedBuild, currentBr, branch, commitResult[1])
+
   // 将操作记录写入缓存
   setProjectScript(project, { ciType, ciMessage, isNeedBuild }, cache)
 }
 
-export const cherryPick = async (commitId: string, branch: string) => {
+export const cherryPick = async (commitId?: string, branch?: string) => {
   if (!commitId) {
     spinner.fail('commitId 不存在')
     process.exit(0)
   } else if (!branch) {
     spinner.fail('目标 branch 不存在')
     process.exit(0)
+  } else if (branch) {
+    await isBranchExist(branch)
   }
 
   // 检查是否存在可提交信息
@@ -99,8 +100,7 @@ export const cherryPick = async (commitId: string, branch: string) => {
     process.exit(0)
   }
 
-  let currentBr: string = await runCmd(cmd.GIT_HEAD)
-  currentBr = currentBr.trim()
+  const currentBr: string = await getCurrentBr()
   if (branch === currentBr) {
     spinner.info('cherry-pick 不能在同一个分支上进行')
     process.exit(0)
