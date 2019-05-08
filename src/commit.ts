@@ -124,13 +124,14 @@ async function pushCommit (
     // checkout pull cherry-pick build commit push checkout
     await cherryPickCommit(targetBranch, commitId)
     // build
-    await runCmd([
-      cmd.GIT_ADD,
-      cmd.gitCi('build', '打包', currentBranch),
-      cmd.GIT_PUSH
-    ]).catch((e: Error) => {
-      console.log(e)
-    })
+    const hasChanges = await hasStaged()
+    if (hasChanges) {
+      await runCmd([
+        cmd.GIT_ADD,
+        cmd.gitCi('build', '打包', currentBranch),
+        cmd.GIT_PUSH
+      ])
+    }
     await push()
     await runCmd(cmd.gitCo(currentBranch))
   } else {
