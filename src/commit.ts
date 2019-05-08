@@ -128,7 +128,9 @@ async function pushCommit (
       cmd.GIT_ADD,
       cmd.gitCi('build', '打包', currentBranch),
       cmd.GIT_PUSH
-    ])
+    ]).catch((e: Error) => {
+      console.log(e)
+    })
     await push()
     await runCmd(cmd.gitCo(currentBranch))
   } else {
