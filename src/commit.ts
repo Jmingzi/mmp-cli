@@ -17,32 +17,19 @@ async function isBranchExist (branch: string): Promise<void> {
   }
 }
 
-async function pushCommit (
-  isNeedBuild: boolean,
-  isCurrentInMainBr: boolean,
-  currentBranch: string,
-  targetBranch?: string,
-  commitId?: string
-): Promise<void> {
-  if (targetBranch && currentBranch !== targetBranch) {
-    await cherryPickCommit(targetBranch, commitId)
-  } else {
-    // 非主分支直接 pull 而不是 rebase
-    await pull(!isCurrentInMainBr)
+async function needBuild (branch: string, getField: (x: string) => any) {
+  const mainBrList = getField('mainBrList')
+  let isNeedBuild: boolean = false
+  if (mainBrList.includes(branch)) {
+    // 目标分支存在且为主分支
+    // 目标分支不存在，当前分支为主分支
+    const buildQuaRes = await prompt({ ...config.needBuild, default: getField('isNeedBuild') })
+    isNeedBuild = buildQuaRes.isNeedBuild
   }
-
-  if (isNeedBuild) {
-    console.log('build')
-  }
-
-  await push()
+  return isNeedBuild
 }
 
 export const commit = async (branch?: string) => {
-  const project = getProjectRoot()
-  const cache = getCache()
-  const getField = getScriptField(cache, project)
-
   if (branch) {
     // 检查branch是否存在
     await isBranchExist(branch)
@@ -56,6 +43,9 @@ export const commit = async (branch?: string) => {
     process.exit(0)
   }
 
+  const project = getProjectRoot()
+  const cache = getCache()
+  const getField = getScriptField(cache, project)
   const currentBr: string = await getCurrentBr()
   // 提交当前工作区
   const { ciType } = await prompt({ ...config.ciType, default: getField('ciType') })
@@ -69,18 +59,17 @@ export const commit = async (branch?: string) => {
   spinner.succeed(`提交完成[${commitResult[1]}]\n  ${commitMessageCommand.match(/"(.*)"/)[1]}`)
 
   const mainBrList = getField('mainBrList')
-  let isNeedBuild: boolean = false
-  if (mainBrList.includes(branch || currentBr)) {
-    // 目标分支存在且为主分支
-    // 目标分支不存在，当前分支为主分支
-    const buildQuaRes = await prompt({ ...config.needBuild, default: getField('isNeedBuild') })
-    isNeedBuild = buildQuaRes.isNeedBuild
-  }
-
+  const isNeedBuild: boolean = await needBuild(branch || currentBr, getField)
   // 将操作记录写入缓存
   setProjectScript(project, { ciType, ciMessage, isNeedBuild }, cache)
 
-  await pushCommit(isNeedBuild, mainBrList.includes(currentBr), currentBr, branch, commitResult[1])
+  if (branch && currentBr !== branch) {
+    // checkout pull cherry-pick build push checkout
+    await pushCommit(true, isNeedBuild, currentBr, branch, commitResult[1])
+  } else if (mainBrList.includes(currentBr)) {
+    // pull build push
+    await pushCommit(false, isNeedBuild, currentBr, branch, commitResult[1])
+  }
 }
 
 export const cherryPick = async (commitId?: string, branch?: string) => {
@@ -113,6 +102,38 @@ export const cherryPick = async (commitId?: string, branch?: string) => {
   if (!idArr.includes(commitId)) {
     spinner.fail(`cherry-pick [${commitId}] 不存在`)
     process.exit(0)
+  }
+
+  const project = getProjectRoot()
+  const cache = getCache()
+  const getField = getScriptField(cache, project)
+  const isNeedBuild: boolean = await needBuild(branch || currentBr, getField)
+  // checkout pull cherry-pick build push checkout
+  await pushCommit(true, isNeedBuild, currentBr, branch, commitId)
+}
+
+async function pushCommit (
+  isNeedCheckout: boolean = false,
+  isNeedBuild: boolean,
+  currentBranch: string,
+  targetBranch?: string,
+  commitId?: string
+): Promise<void> {
+  if (isNeedCheckout) {
+    // checkout pull cherry-pick build commit push checkout
+    await cherryPickCommit(targetBranch, commitId)
+    // build
+    await runCmd([
+      cmd.GIT_ADD,
+      cmd.gitCi('build', '打包', currentBranch),
+      cmd.GIT_PUSH
+    ])
+    await push()
+    await runCmd(cmd.gitCo(currentBranch))
+  } else {
+    await pull()
+    // build
+    await push()
   }
 }
 
