@@ -47,7 +47,7 @@ export async function initConfig() {
   const mainBrScriptMap: Api = {}
   let i = 0
   async function doNotice(name: string) {
-    mainBrScriptMap[name] = await notice(name)
+    mainBrScriptMap[name] = await notice(name, getField(name))
     i ++
     if (i < mainBrArr.length) {
       await doNotice(mainBrArr[i])
@@ -59,11 +59,12 @@ export async function initConfig() {
   spinner.succeed('初始化配置完成. 可使用 mmp ls 查看详情')
 }
 
-async function notice(name: string) {
+async function notice(name: string, brCmd?: string) {
   const cmdName = await prompt({
     type: 'input',
     name,
     message: `请输入${name}分支打包命令`,
+    default: brCmd,
     validate(input: string) {
       const done = this.async()
       if (!input) {
