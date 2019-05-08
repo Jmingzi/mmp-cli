@@ -125,6 +125,7 @@ async function pushCommit (
     // checkout pull cherry-pick build commit push checkout
     await cherryPickCommit(targetBranch, commitId)
 
+    console.log('isNeedBuild', isNeedBuild)
     if (isNeedBuild) {
       await build()
       const hasChanges = await hasStaged()

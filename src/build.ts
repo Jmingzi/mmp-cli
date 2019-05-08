@@ -30,7 +30,10 @@ const build = async () => {
     buildCmd = await initSingleBr(currentBr)
   }
 
-  await buildScript(buildCmd)
+  await buildScript(buildCmd).catch((e: Error) => {
+    console.log(e)
+    process.exit(0)
+  })
 }
 
 function buildScript (cmd: string) {
