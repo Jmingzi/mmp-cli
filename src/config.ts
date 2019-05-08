@@ -19,7 +19,7 @@ module.exports = {
     type: 'input',
     name: 'ciMessage',
     message: '请输入提交信息',
-    validate(input) {
+    validate(input: string) {
       const done = this.async()
       if (!input.toString().trim()) {
         done('提交信息必填')
@@ -58,7 +58,7 @@ module.exports = {
     type: 'input',
     name: 'scriptBranch',
     message: '请输入主分支名称，空格分隔',
-    validate(input) {
+    validate(input: string) {
       const done = this.async()
       const res = input.split(' ')
       if (res.length < 2) {

@@ -14,7 +14,7 @@ export const getBr = async (): Promise<string[]> => {
   })
 }
 
-export const hasStaged = async () => {
+export const hasStaged = async (): Promise<boolean> => {
   const res = await runCmd('git status')
   return /Changes not staged for commit|Changes to be committed/i.test(res)
 }

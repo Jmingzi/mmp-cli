@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 const { print } = require('../lib/utils/output.js')
+const { commit, cherryPick } = require('../lib-dist/commit.js')
 const chalk = require('chalk')
 const program = require('commander')
 // const check = require('../lib/checkVersion')
@@ -46,7 +47,7 @@ program
   .description('一键处理提交')
   .action((branch) => {
     check().then(() => {
-      require('../lib-dist/commit.js')(branch)
+      commit(branch)
       // require('../lib/commit.js')(branch)
     })
   })

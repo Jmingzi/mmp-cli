@@ -27,7 +27,7 @@ const self = {
 
   ...asyncApi,
 
-  runCmd: async (cmd: string | string[]) => {
+  runCmd: async (cmd: string | string[]): Promise<string> => {
     if (typeof cmd === 'string') {
       cmd = [cmd]
     }
