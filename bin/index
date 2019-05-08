@@ -29,7 +29,7 @@ program
   .action(() => {
     check().then(() => {
       // require('../lib/build.js')()
-      require('../lib-dist/build.js')()
+      require('../lib-dist/build.js')(true)
     })
   })
 

@@ -2,15 +2,16 @@ const Ora = require('ora')
 const path = require('path')
 const childProcess = require('child_process')
 
+const cmd = require('./utils/cmd-constant')
 const { getProjectRoot, runCmd } = require('./utils/util')
 const { getCache, getScriptField } = require('./utils/cache')
-const { getCurrentBr } = require('./utils/git')
+const { getCurrentBr, hasStaged } = require('./utils/git')
 const { initSingleBr } = require('./init')
 const spinner = new Ora()
 
 import { SpawnResult } from './utils/build-script'
 
-const build = async () => {
+const build = async (buildImmediate?: boolean) => {
   const project = getProjectRoot()
   const cache = getCache()
   const getField = getScriptField(cache, project)
@@ -30,16 +31,27 @@ const build = async () => {
     buildCmd = await initSingleBr(currentBr)
   }
 
-  await buildScript(buildCmd).catch((e: Error) => {
-    console.log(e)
+  await buildScript(buildCmd)
+
+  const hasChanges = await hasStaged()
+  if (hasChanges) {
+    await runCmd([
+      cmd.GIT_ADD,
+      cmd.gitCi('build', '打包', currentBr),
+      cmd.GIT_PUSH
+    ])
+  } else {
+    spinner.info('📦 打包后无可提交信息')
+  }
+  if (buildImmediate) {
     process.exit(0)
-  })
+  }
 }
 
 function buildScript (cmd: string) {
   return new Promise((resolve, reject) => {
     spinner.start('打包中')
-    const subBuild = childProcess.fork(path.resolve(__dirname, './utils/buildScript.js'), {
+    const subBuild = childProcess.fork(path.resolve(__dirname, './utils/build-script'), {
       cwd: process.cwd()
     })
 

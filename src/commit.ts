@@ -128,14 +128,6 @@ async function pushCommit (
 
     if (isNeedBuild) {
       await build()
-      const hasChanges = await hasStaged()
-      if (hasChanges) {
-        await runCmd([
-          cmd.GIT_ADD,
-          cmd.gitCi('build', '打包', currentBranch),
-          cmd.GIT_PUSH
-        ])
-      }
     }
 
     await push()

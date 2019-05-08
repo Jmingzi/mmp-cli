@@ -49,18 +49,18 @@ export const setProjectScript = (
   messageObj: ConfigItem,
   fullObj: Config
 ): void => {
-  if (!fullObj.script) {
+  if (!fullObj.script[projectName]) {
     fullObj.script = {
-      [projectName]: {}
+      [projectName]: defaultConfigItem
     }
   }
   fullObj.script[projectName] = {
-    ...(fullObj.script[projectName] || null),
+    ...fullObj.script[projectName],
     ...messageObj
   }
   setCache(fullObj)
 }
 
 export const getScriptField = (fullObj: Config, project: string) => {
-  return (field: string) => fullObj && fullObj.script[project] ? fullObj.script[project][field] : null
+  return (field: string) => fullObj && fullObj.script[project] ? fullObj.script[project][field] : defaultConfigItem[field]
 }
