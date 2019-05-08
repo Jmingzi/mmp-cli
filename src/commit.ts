@@ -115,7 +115,7 @@ export const cherryPick = async (commitId?: string, branch?: string) => {
 }
 
 async function pushCommit (
-  isNeedCheckout: boolean = false,
+  isNeedCheckout: boolean,
   isNeedBuild: boolean,
   currentBranch: string,
   targetBranch?: string,
