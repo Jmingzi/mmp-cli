@@ -4,8 +4,9 @@ const prompt = require('inquirer').createPromptModule()
 const { getProjectRoot, runCmd } = require('./utils/util')
 const { getCache, getScriptField, setProjectScript } = require('./utils/cache')
 const { getCommitIdLog, getBr, hasStaged, getCurrentBr, pull, push, cherryPickCommit } = require('./utils/git')
-const cmd = require('./utils/cmdConstant')
+const cmd = require('./utils/cmd-constant')
 const config = require('./config')
+const build = require('./build')
 const spinner = new Ora()
 
 async function isBranchExist (branch: string): Promise<void> {
@@ -123,7 +124,7 @@ async function pushCommit (
   if (isNeedCheckout) {
     // checkout pull cherry-pick build commit push checkout
     await cherryPickCommit(targetBranch, commitId)
-    // build
+    await build()
     const hasChanges = await hasStaged()
     if (hasChanges) {
       await runCmd([
@@ -135,10 +136,10 @@ async function pushCommit (
     await push()
     spinner.start(`切回 ${currentBranch} 分支`)
     await runCmd(cmd.gitCo(currentBranch))
-    spinner.succeed(`切回 ${currentBranch} 成功`)
+    spinner.succeed(`切回 ${currentBranch} 分支成功`)
   } else {
     await pull()
-    // build
+    await build()
     await push()
   }
 }

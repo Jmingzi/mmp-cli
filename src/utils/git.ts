@@ -1,5 +1,5 @@
 const Ora = require('ora')
-const cmdConstant = require('./cmdConstant')
+const cmdConstant = require('./cmd-constant')
 const { runCmd } = require('./util')
 const spinner = new Ora()
 
@@ -29,12 +29,12 @@ export const getCurrentBr = async (): Promise<string> => {
 export const pull = async (isRebase: boolean = true) => {
   const cmd = isRebase ? cmdConstant.GIT_PULL_REBASE : cmdConstant.GIT_PULL
   spinner.start(`拉取远程 ${cmd}`)
-  await runCmd(cmd).catch((err: Error) => {
+  const pullRes = await runCmd(cmd).catch((err: Error) => {
     console.log('\n' + err)
     spinner.fail(`拉取失败`)
     process.exit(0)
   })
-  spinner.succeed('拉取成功')
+  spinner.succeed(/Already up to date/.test(pullRes) ? '远程仓库无更新' : '远程仓库有更新，已拉取到本地')
 }
 
 export const push = async () => {

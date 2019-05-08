@@ -2,6 +2,7 @@
 
 const { print } = require('../lib/utils/output.js')
 const { commit, cherryPick } = require('../lib-dist/commit.js')
+const { initConfig } = require('../lib-dist/init.js')
 const chalk = require('chalk')
 const program = require('commander')
 // const check = require('../lib/checkVersion')
@@ -17,7 +18,8 @@ program
   .description('配置初始化，命令配置只支持package.json中存在的')
   .action(() => {
     check().then(() => {
-      require('../lib/init.js')()
+      // require('../lib/init.js')()
+      initConfig()
     })
   })
 
@@ -27,7 +29,8 @@ program
   .description('在master、develop分支上打包并提交')
   .action(() => {
     check().then(() => {
-      require('../lib/build.js')()
+      // require('../lib/build.js')()
+      require('../lib-dist/build.js')()
     })
   })
 
@@ -47,8 +50,8 @@ program
   .description('一键处理提交')
   .action((branch) => {
     check().then(() => {
-      commit(branch)
-      // require('../lib/commit.js')(branch)
+      // commit(branch)
+      require('../lib/commit.js')(branch)
     })
   })
 

@@ -23,6 +23,13 @@ export const defaultConfig: Config = {
   script: {}
 }
 
+export const defaultConfigItem: ConfigItem = {
+  ciType: 'fix',
+  ciMessage: '',
+  isNeedBuild: false,
+  mainBrList: ['master', 'develop']
+}
+
 export const setCache = (fullObj: Config) => {
   fs.writeFileSync(configPath, JSON.stringify(fullObj, null, 2))
 }
@@ -33,6 +40,7 @@ export const getCache = (): void | Config => {
     return res ? JSON.parse(res) : null
   } catch (e) {
     setCache(defaultConfig)
+    return defaultConfig
   }
 }
 
@@ -47,7 +55,7 @@ export const setProjectScript = (
     }
   }
   fullObj.script[projectName] = {
-    ...fullObj.script[projectName],
+    ...(fullObj.script[projectName] || null),
     ...messageObj
   }
   setCache(fullObj)

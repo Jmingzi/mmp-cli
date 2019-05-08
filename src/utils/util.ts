@@ -4,8 +4,7 @@ const path = require('path')
 const childProcess = require('child_process')
 const boxen = require('boxen')
 const colors = require('colors/safe')
-
-const cmdConstant = require('./cmdConstant')
+// const cmdConstant = require('./cmd-constant')
 
 interface Api {
   [x: string]: any
