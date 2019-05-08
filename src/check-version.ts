@@ -1,11 +1,9 @@
 const semver = require('semver')
 const Ora = require('ora')
-const colors = require('colors/safe')
 
 const { getCache, setCache } = require('./utils/cache')
 const { runCmd, noticeUpdate } = require('./utils/util')
 const { get } = require('./utils/http')
-const { defaultConfig } = require('./utils/cache')
 const spinner = new Ora()
 
 export const checkNode = async (): Promise<void> => {
