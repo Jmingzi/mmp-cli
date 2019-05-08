@@ -63,7 +63,7 @@ program
     if (commit_id && branch) {
       check().then(() => {
         // require('../lib/commit.js')(branch, commit_id)
-        cherryPick(branch, commit_id)
+        cherryPick(commit_id, branch)
       })
     } else {
       cmd.help()
