@@ -34,8 +34,7 @@ export const pull = async (isRebase: boolean = true) => {
     spinner.fail(`拉取失败`)
     process.exit(0)
   })
-  console.log(pullRes)
-  spinner.succeed(/Already up to date/.test(pullRes) ? '远程仓库无更新' : '远程仓库有更新，已拉取到本地')
+  spinner.succeed(/up to date/.test(pullRes) ? '远程仓库无更新' : '远程仓库有更新，已拉取到本地')
 }
 
 export const push = async () => {
