@@ -124,22 +124,28 @@ async function pushCommit (
   if (isNeedCheckout) {
     // checkout pull cherry-pick build commit push checkout
     await cherryPickCommit(targetBranch, commitId)
-    await build()
-    const hasChanges = await hasStaged()
-    if (hasChanges) {
-      await runCmd([
-        cmd.GIT_ADD,
-        cmd.gitCi('build', '打包', currentBranch),
-        cmd.GIT_PUSH
-      ])
+
+    if (isNeedBuild) {
+      await build()
+      const hasChanges = await hasStaged()
+      if (hasChanges) {
+        await runCmd([
+          cmd.GIT_ADD,
+          cmd.gitCi('build', '打包', currentBranch),
+          cmd.GIT_PUSH
+        ])
+      }
     }
+
     await push()
     spinner.start(`切回 ${currentBranch} 分支`)
     await runCmd(cmd.gitCo(currentBranch))
     spinner.succeed(`切回 ${currentBranch} 分支成功`)
   } else {
     await pull()
-    await build()
+    if (isNeedBuild) {
+      await build()
+    }
     await push()
   }
 }
