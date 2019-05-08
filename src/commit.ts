@@ -75,10 +75,10 @@ export const commit = async (branch?: string) => {
     isNeedBuild = buildQuaRes.isNeedBuild
   }
 
-  await pushCommit(isNeedBuild, currentBr, branch, commitResult[1])
-
   // 将操作记录写入缓存
   setProjectScript(project, { ciType, ciMessage, isNeedBuild }, cache)
+
+  await pushCommit(isNeedBuild, currentBr, branch, commitResult[1])
 }
 
 export const cherryPick = async (commitId?: string, branch?: string) => {
