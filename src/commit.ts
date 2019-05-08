@@ -1,3 +1,4 @@
+// pit: not module. https://www.jianshu.com/p/78268bd9af0a
 const Ora = require('ora')
 const prompt = require('inquirer').createPromptModule()
 
@@ -150,6 +151,3 @@ async function pushCommit (
     await push()
   }
 }
-
-// pit: not module. https://www.jianshu.com/p/78268bd9af0a
-// export = commit
