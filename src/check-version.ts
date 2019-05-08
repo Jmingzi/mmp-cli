@@ -36,5 +36,5 @@ export const check = async (): Promise<void> => {
     noticeUpdate(localVersion.trim(), version)
   }
   spinner.succeed('校验版本完成')
-  setCache({ ...defaultConfig, lastCheckTs: Date.now() })
+  setCache({ ...cache, lastCheckTs: Date.now() })
 }
