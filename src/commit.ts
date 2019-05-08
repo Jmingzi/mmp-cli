@@ -133,7 +133,9 @@ async function pushCommit (
       ])
     }
     await push()
+    spinner.start(`切回 ${currentBranch} 分支`)
     await runCmd(cmd.gitCo(currentBranch))
+    spinner.succeed(`切回 ${currentBranch} 成功`)
   } else {
     await pull()
     // build
