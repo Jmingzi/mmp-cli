@@ -63,12 +63,13 @@ export const commit = async (branch?: string) => {
   // 将操作记录写入缓存
   setProjectScript(project, { ciType, ciMessage, isNeedBuild }, cache)
 
+  const doPush = (needCheck: boolean) => { pushCommit(needCheck, isNeedBuild, currentBr, branch, commitResult[1]) }
   if (branch && currentBr !== branch) {
     // checkout pull cherry-pick build push checkout
-    await pushCommit(true, isNeedBuild, currentBr, branch, commitResult[1])
+    doPush(true)
   } else if (mainBrList.includes(currentBr)) {
     // pull build push
-    await pushCommit(false, isNeedBuild, currentBr, branch, commitResult[1])
+    doPush(false)
   }
 }
 
