@@ -1,10 +1,9 @@
 #!/usr/bin/env node
+const chalk = require('chalk')
+const program = require('commander')
 
 const { print } = require('../lib/utils/output.js')
 const { commit, cherryPick } = require('../lib-dist/commit.js')
-// const { initConfig } = require('../lib-dist/init.js')
-const chalk = require('chalk')
-const program = require('commander')
 const { check } = require('../lib-dist/check-version')
 
 program
