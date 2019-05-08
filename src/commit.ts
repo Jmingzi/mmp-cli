@@ -19,6 +19,7 @@ async function isBranchExist (branch: string): Promise<void> {
 
 async function pushCommit (
   isNeedBuild: boolean,
+  isCurrentInMainBr: boolean,
   currentBranch: string,
   targetBranch?: string,
   commitId?: string
@@ -26,7 +27,8 @@ async function pushCommit (
   if (targetBranch && currentBranch !== targetBranch) {
     await cherryPickCommit(targetBranch, commitId)
   } else {
-    await pull()
+    // 非主分支直接 pull 而不是 rebase
+    await pull(!isCurrentInMainBr)
   }
 
   if (isNeedBuild) {
@@ -78,7 +80,7 @@ export const commit = async (branch?: string) => {
   // 将操作记录写入缓存
   setProjectScript(project, { ciType, ciMessage, isNeedBuild }, cache)
 
-  await pushCommit(isNeedBuild, currentBr, branch, commitResult[1])
+  await pushCommit(isNeedBuild, mainBrList.includes(currentBr), currentBr, branch, commitResult[1])
 }
 
 export const cherryPick = async (commitId?: string, branch?: string) => {
