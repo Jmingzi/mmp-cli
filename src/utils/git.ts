@@ -61,7 +61,6 @@ export const cherryPickCommit = async (commitIds: string | string[]) => {
       } else {
         msg += '即完成了全部操作.'
       }
-
       console.log('\n' + e)
       spinner.fail(msg)
       process.exit(0)
