@@ -74,22 +74,13 @@ export const commit = async (branch?: string) => {
   }
 }
 
-export const cherryPick = async (commitId?: string, branch?: string) => {
-  if (!commitId) {
-    spinner.fail('commitId 不存在')
-    process.exit(0)
-  } else if (!branch) {
-    spinner.fail('目标 branch 不存在')
-    process.exit(0)
-  } else if (branch) {
-    await isBranchExist(branch)
-  }
+export const cherryPick = async (commitEndId: string, branch: string, commitStartId?: string) => {
+  await isBranchExist(branch)
 
-  // 检查是否存在可提交信息
   const hasChanges: boolean = await hasStaged()
   if (hasChanges) {
     // 判断是否存在未提交的修改
-    spinner.info(`当前工作区存在修改未提交，使用 git status 查看`)
+    spinner.info(`当前工作区存在修改未提交，请先暂存或提交`)
     process.exit(0)
   }
 
@@ -101,8 +92,18 @@ export const cherryPick = async (commitId?: string, branch?: string) => {
 
   // 判断commitId是否存在
   const idArr = await getCommitIdLog()
-  if (!idArr.includes(commitId)) {
-    spinner.fail(`cherry-pick [${commitId}] 不存在`)
+  let commitIds
+  let startIndex = commitStartId ? idArr.findIndex((x: string): boolean => x === commitStartId) : -1
+  let endIndex = idArr.findIndex((x: string): boolean => x === commitEndId)
+
+  if (startIndex > endIndex) {
+    [startIndex, endIndex] = [endIndex, startIndex]
+  }
+  if (endIndex > -1) {
+    // 收集 commit ids
+    commitIds = idArr.slice(startIndex || 0, endIndex + 1)
+  } else {
+    spinner.fail(`commitId [${commitEndId}] 不在最近 20 条 log 中`)
     process.exit(0)
   }
 
@@ -111,7 +112,7 @@ export const cherryPick = async (commitId?: string, branch?: string) => {
   const getField = getScriptField(cache, project)
   const isNeedBuild: boolean = await needBuild(branch || currentBr, getField)
   // checkout pull cherry-pick build push checkout
-  await pushCommit(true, isNeedBuild, currentBr, branch, commitId)
+  await pushCommit(true, isNeedBuild, currentBr, branch, commitIds)
 }
 
 async function pushCommit (
@@ -119,7 +120,7 @@ async function pushCommit (
   isNeedBuild: boolean,
   currentBranch: string,
   targetBranch?: string,
-  commitId?: string
+  commitId?: string | string[]
 ): Promise<void> {
   if (isNeedCheckout) {
     // checkout pull cherry-pick build commit push checkout

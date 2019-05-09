@@ -55,14 +55,28 @@ program
   })
 
 program
-  .command('cp [commit_id] [branch]')
-  .usage('<command> [commit_id] [branch]')
-  .description('cherry-pick 到目标分支，只能pick最近10条提交')
-  .action((commit_id, branch, cmd) => {
-    if (commit_id && branch) {
+  .command('cp [commit_start_id] [commit_end_id] [branch]')
+  .usage('<command> [commit_start_id] [commit_end_id] [branch]')
+  .description('cherry-pick 到目标分支，只能pick最近20条范围的提交，commit_start_id 可选，默认是第一条 commit')
+  .action((commit_start_id, commit_end_id, branch, cmd) => {
+    let start
+    let end
+    if (branch) {
+      if (commit_start_id && commit_end_id) {
+        start = commit_start_id
+        end = commit_end_id
+      } else if (commit_start_id || commit_end_id) {
+        end = commit_start_id || commit_end_id
+      }
+    } else {
+      end = commit_start_id
+      branch = commit_end_id
+    }
+
+    if (end && branch) {
       check().then(() => {
         // require('../lib/commit.js')(branch, commit_id)
-        cherryPick(commit_id, branch)
+        cherryPick(end, branch, start)
       })
     } else {
       cmd.help()

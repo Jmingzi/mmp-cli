@@ -47,18 +47,35 @@ export const push = async () => {
   spinner.succeed('推送成功')
 }
 
-export const cherryPickCommit = async (commitId: string) => {
-  spinner.start(`cherry-pick ${commitId}`)
-  try {
-    // await runCmd(cmdConstant.gitCo(targetBranch))
-    // await pull()
-    await runCmd(cmdConstant.gitCp(commitId))
-  } catch (e) {
-    console.log('\n' + e)
-    spinner.fail(`cherry-pick 失败`)
-    process.exit(0)
+export const cherryPickCommit = async (commitIds: string | string[]) => {
+  const innerCheck = async (commitId: string, i: number) => {
+    spinner.start(`  cherry-pick [${commitId}]`)
+    try {
+      await runCmd(cmdConstant.gitCp(commitId))
+    } catch (e) {
+      let msg = `cherry-pick [${commitId}] 失败. 处理完这条commit，`
+      const remainLen = i !== -1 ? commitIds.length - 1 - i : 0
+      if (remainLen) {
+        msg += `还剩 ${remainLen} 条待处理，执行 mmp cp ${commitIds[i + 1]} ${remainLen > 1 ? commitIds[commitIds.length - 1] : ''} [branch]`
+      } else {
+        msg += '即完成了全部操作.'
+      }
+
+      console.log('\n' + e)
+      spinner.fail(msg)
+      process.exit(0)
+    }
+    spinner.end(`  cherry-pick ${commitId} 完成`)
   }
-  spinner.succeed(`cherry-pick 完成`)
+  if (Array.isArray(commitIds)) {
+    spinner.info(`cherry-pick 共 ${commitIds.length} 条提交`)
+    for (let i = 0; i < commitIds.length; i++) {
+      await innerCheck(commitIds[i], i)
+    }
+    spinner.succeed(`cherry-pick 完成`)
+  } else {
+    await innerCheck(commitIds, -1)
+  }
 }
 
 export const checkout = async (branch: string) => {
