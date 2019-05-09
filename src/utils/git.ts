@@ -56,7 +56,8 @@ export const cherryPickCommit = async (commitIds: string | string[]) => {
       let msg = `cherry-pick [${commitId}] 失败. 处理完这条commit，`
       const remainLen = i !== -1 ? commitIds.length - 1 - i : 0
       if (remainLen) {
-        msg += `还剩 ${remainLen} 条待处理，执行 mmp cp ${commitIds[i + 1]} ${remainLen > 1 ? commitIds[commitIds.length - 1] : ''} [branch]`
+        msg += `还剩 ${remainLen} 条待处理，切回分支继续执行 `
+        msg += `mmp cp ${commitIds[i + 1]} ${remainLen > 1 ? commitIds[commitIds.length - 1] : ''} [branch] 完成操作`
       } else {
         msg += '即完成了全部操作.'
       }
