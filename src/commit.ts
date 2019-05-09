@@ -107,6 +107,9 @@ export const cherryPick = async (commitEndId: string, branch: string, commitStar
     process.exit(0)
   }
 
+  console.log(commitIds)
+  process.exit(1)
+
   const project = getProjectRoot()
   const cache = getCache()
   const getField = getScriptField(cache, project)
