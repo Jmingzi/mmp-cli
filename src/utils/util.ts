@@ -4,8 +4,7 @@ const path = require('path')
 const childProcess = require('child_process')
 const boxen = require('boxen')
 const colors = require('colors/safe')
-// const cmdConstant = require('./cmd-constant')
-const homePath = /^win/.test(process.platform) ? process.env.HOMEPATH : process.env.HOME
+const homePath = /^win/.test(process.platform) ? path.join('C:', process.env.HOMEPATH) : process.env.HOME
 
 interface Api {
   [x: string]: any

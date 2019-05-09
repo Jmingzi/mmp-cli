@@ -41,6 +41,7 @@ export const getCache = (): void | Config => {
     const res = fs.readFileSync(configPath, 'utf8')
     return res ? JSON.parse(res) : null
   } catch (e) {
+    // 创建配置文件
     setCache(defaultConfig)
     return defaultConfig
   }
