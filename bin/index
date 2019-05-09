@@ -2,62 +2,26 @@
 const chalk = require('chalk')
 const program = require('commander')
 const colors = require('colors/safe')
-
-// const { print } = require('../lib/utils/output.js')
-const { commit, cherryPick } = require('../lib-dist/commit.js')
-const { check } = require('../lib-dist/check-version')
+const { check } = require('../lib/check-version')
 
 program
   .version(require('../package').version)
   .usage('<command> [options]')
 
 program
-  .command('init')
-  .usage('<command>')
-  .description('配置初始化，命令配置只支持package.json中存在的')
-  .action(() => {
-    check().then(() => {
-      // require('../lib/init.js')()
-      require('../lib-dist/init.js').initConfig()
-    })
-  })
-
-program
-  .command('build')
-  .usage('<command>')
-  .description('在master、develop分支上打包并提交')
-  .action(() => {
-    check().then(() => {
-      // require('../lib/build.js')()
-      require('../lib-dist/build.js')(true)
-    })
-  })
-
-program
-  .command('ls')
-  .usage('<command>')
-  .description('列出当前配置')
-  .action(() => {
-    check().then(() => {
-      require('../lib/ls.js')()
-    })
-  })
-
-program
   .command('ci [branch]')
   .usage('<command> [branch]')
-  .description('一键处理提交')
+  .description('提交改动到 [branch] 分支')
   .action((branch) => {
     check().then(() => {
-      commit(branch)
-      // require('../lib/commit.js')(branch)
+      require('../lib/commit.js').commit(branch)
     })
   })
 
 program
   .command('cp [commit_start_id] [commit_end_id] [branch]')
   .usage('<command> [commit_start_id] [commit_end_id] [branch]')
-  .description('cherry-pick 到目标分支，只能pick最近20条范围的提交，commit_start_id 可选，默认是第一条 commit')
+  .description('cherry-pick 最近20条commit范围内的提交到[branch]分支，commit_start_id 可选')
   .action((commit_start_id, commit_end_id, branch, cmd) => {
     let start
     let end
@@ -75,12 +39,41 @@ program
 
     if (end && branch) {
       check().then(() => {
-        // require('../lib/commit.js')(branch, commit_id)
-        cherryPick(end, branch, start)
+        require('../lib/commit.js').cherryPick(end, branch, start)
       })
     } else {
       cmd.help()
     }
+  })
+
+program
+  .command('ls')
+  .usage('<command>')
+  .description('列出当前项目配置')
+  .action(() => {
+    check().then(() => {
+      require('../lib/init.js').ls()
+    })
+  })
+
+program
+  .command('init')
+  .usage('<command>')
+  .description('配置初始化')
+  .action(() => {
+    check().then(() => {
+      require('../lib/init.js').initConfig()
+    })
+  })
+
+program
+  .command('build')
+  .usage('<command>')
+  .description('在主分支上执行打包并提交')
+  .action(() => {
+    check().then(() => {
+      require('../lib/build.js')(true)
+    })
   })
 
 program
@@ -96,7 +89,7 @@ program
       }
       // if (/ /.test(arr[1]) && /^`$/.test(arr[1]))
       check().then(() => {
-        require('../lib/setConfig.js').setBrCmd(arr[0], arr[1])
+        require('../lib/init.js').setBrCmd(arr[0], arr[1])
       })
     } else {
       cmd.help()
@@ -110,11 +103,35 @@ program
   .action((branch, cmd) => {
     if (branch) {
       check().then(() => {
-        require('../lib/setConfig.js').addBr(branch)
+        require('../lib/init.js').addMainBr(branch)
       })
     } else {
       cmd.help()
     }
+  })
+
+program
+  .command('del [branch]')
+  .usage('<command>')
+  .description('删除主分支及其命令')
+  .action((branch, cmd) => {
+    if (branch) {
+      check().then(() => {
+        require('../lib/init.js').delMainBr(branch)
+      })
+    } else {
+      cmd.help()
+    }
+  })
+
+program
+  .command('delp')
+  .usage('<command>')
+  .description('删除项目配置')
+  .action(() => {
+    check().then(() => {
+      require('../lib/init.js').delProject()
+    })
   })
 
 // output help information on unknown commands

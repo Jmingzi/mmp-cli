@@ -1,5 +1,7 @@
 const fs = require('fs')
+const Ora = require('ora')
 const { configPath } = require('./util')
+const spinner = new Ora()
 
 interface ConfigItem {
   ciType?: string,
@@ -60,5 +62,13 @@ export const setProjectScript = (
 }
 
 export const getScriptField = (fullObj: Config, project: string) => {
-  return (field: string) => fullObj && fullObj.script[project] ? fullObj.script[project][field] : defaultConfigItem[field]
+  return (field: string) => {
+    if (fullObj && fullObj.script[project]) {
+      return fullObj.script[project][field]
+    }
+    spinner.info('项目配置不存在，初始化默认配置')
+    console.log(JSON.stringify(defaultConfigItem, null, 2))
+    setProjectScript(project, {}, fullObj)
+    return defaultConfigItem[field]
+  }
 }
