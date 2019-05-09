@@ -5,6 +5,7 @@ const childProcess = require('child_process')
 const boxen = require('boxen')
 const colors = require('colors/safe')
 // const cmdConstant = require('./cmd-constant')
+const homePath = /^win/.test(process.platform) ? process.env.HOMEPATH : process.env.HOME
 
 interface Api {
   [x: string]: any
@@ -22,7 +23,7 @@ const asyncApi = promisify([
 ])
 
 const self = {
-  configPath: `${process.env.HOME}/.mmprc`,
+  configPath: path.join(homePath, '.mmprc'),
 
   ...asyncApi,
 
