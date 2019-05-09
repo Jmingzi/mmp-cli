@@ -49,7 +49,6 @@ export const commit = async (branch?: string) => {
   const cache = getCache()
   const getField = getScriptField(cache, project)
   const currentBr: string = await getCurrentBr()
-  // 提交当前工作区
   const { ciType } = await prompt({ ...config.ciType, default: getField('ciType') })
   const { ciMessage } = await prompt({ ...config.ciMessage, default: getField('ciMessage') })
   spinner.start('提交当前分支')

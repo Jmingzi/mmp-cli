@@ -50,9 +50,7 @@ export const setProjectScript = (
   fullObj: Config
 ): void => {
   if (!fullObj.script[projectName]) {
-    fullObj.script = {
-      [projectName]: defaultConfigItem
-    }
+    fullObj.script[projectName] = defaultConfigItem
   }
   fullObj.script[projectName] = {
     ...fullObj.script[projectName],
