@@ -65,7 +65,7 @@ export const cherryPickCommit = async (commitIds: string | string[]) => {
       spinner.fail(msg)
       process.exit(0)
     }
-    spinner.end(`  cherry-pick ${commitId} 完成`)
+    spinner.succeed(`  cherry-pick ${commitId} 完成`)
   }
   if (Array.isArray(commitIds)) {
     spinner.info(`cherry-pick 共 ${commitIds.length} 条提交`)
