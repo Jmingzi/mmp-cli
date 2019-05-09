@@ -1,12 +1,12 @@
 {
   "name": "mmp-cli",
-  "version": "1.0.37",
+  "version": "1.0.38",
   "description": "git 工作流快捷工具",
   "main": "bin/index",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "tsc -w",
-    "build": "npm run lint && tsc",
+    "build": "npm version patch && tsc",
     "lint": "eslint ./src --ext .ts --fix",
     "local": "node bin/index ci"
   },
@@ -18,7 +18,6 @@
     "cli"
   ],
   "files": [
-    "lib",
     "lib",
     "bin",
     "types"
