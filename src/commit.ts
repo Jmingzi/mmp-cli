@@ -93,7 +93,7 @@ export const cherryPick = async (commitEndId: string, branch: string, commitStar
   // 判断commitId是否存在
   const idArr = await getCommitIdLog()
   let commitIds
-  let startIndex = commitStartId ? idArr.findIndex((x: string): boolean => x === commitStartId) : -1
+  let startIndex = commitStartId ? idArr.findIndex((x: string): boolean => x === commitStartId) : 0
   let endIndex = idArr.findIndex((x: string): boolean => x === commitEndId)
 
   if (startIndex > endIndex) {
@@ -101,14 +101,11 @@ export const cherryPick = async (commitEndId: string, branch: string, commitStar
   }
   if (endIndex > -1) {
     // 收集 commit ids
-    commitIds = idArr.slice(startIndex || 0, endIndex + 1)
+    commitIds = idArr.slice(startIndex, endIndex + 1)
   } else {
     spinner.fail(`commitId [${commitEndId}] 不在最近 20 条 log 中`)
     process.exit(0)
   }
-
-  console.log(commitIds)
-  process.exit(1)
 
   const project = getProjectRoot()
   const cache = getCache()
