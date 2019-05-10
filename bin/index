@@ -82,20 +82,33 @@ program
     })
   })
 
+// program
+//   .command('set [branch_cmd]')
+//   .usage('<command>')
+//   .description('设置单项配置 set master="npm run build"')
+//   .action((branch_cmd, cmd) => {
+//     if (branch_cmd && /=/.test(branch_cmd)) {
+//       const arr = branch_cmd.split('=')
+//       if (arr.length !== 2) {
+//         cmd.help()
+//         process.exit(1)
+//       }
+//       // if (/ /.test(arr[1]) && /^`$/.test(arr[1]))
+//       check().then(() => {
+//         require('../lib/init.js').setBrCmd(arr[0], arr[1])
+//       })
+//     } else {
+//       cmd.help()
+//     }
+//   })
 program
-  .command('set [branch_cmd]')
+  .command('set [branch] [value]')
   .usage('<command>')
-  .description('设置单项配置 set master="npm run build"')
-  .action((branch_cmd, cmd) => {
-    if (branch_cmd && /=/.test(branch_cmd)) {
-      const arr = branch_cmd.split('=')
-      if (arr.length !== 2) {
-        cmd.help()
-        process.exit(1)
-      }
-      // if (/ /.test(arr[1]) && /^`$/.test(arr[1]))
+  .description('设置单项配置 set master "npm run build"')
+  .action((branch, value, cmd) => {
+    if (branch && value) {
       check().then(() => {
-        require('../lib/init.js').setBrCmd(arr[0], arr[1])
+        require('../lib/init.js').setBrCmd(branch, value)
       })
     } else {
       cmd.help()
