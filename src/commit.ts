@@ -2,9 +2,10 @@
 const Ora = require('ora')
 const prompt = require('inquirer').createPromptModule()
 
-const { getProjectRoot, runCmd } = require('./utils/util')
+const { getProjectRoot, runCmd, openBrowser } = require('./utils/util')
 const { getCache, getScriptField, setProjectScript } = require('./utils/cache')
 const { getCommitIdLog, getBr, hasStaged, getCurrentBr, pull, push, cherryPickCommit, checkout } = require('./utils/git')
+const { checkPrFileChanges, checkCommitIds } = require('./pr')
 const cmd = require('./utils/cmd-constant')
 const config = require('./config')
 const build = require('./build')
@@ -32,6 +33,7 @@ async function needBuild (branch: string, getField: (x: string) => any) {
 }
 
 export const commit = async (branch?: string) => {
+  const project = getProjectRoot()
   if (branch) {
     // 检查branch是否存在
     await isBranchExist(branch)
@@ -45,10 +47,17 @@ export const commit = async (branch?: string) => {
     process.exit(0)
   }
 
-  const project = getProjectRoot()
   const cache = getCache()
   const getField = getScriptField(cache, project)
+  const prFileChanges = await checkPrFileChanges(getField('prFilePath'))
+  const prBrList: Array<string> = getField('prBr') || []
+
   const currentBr: string = await getCurrentBr()
+  if (prBrList.includes(currentBr)) {
+    spinner.fail('不允许直接在需要pr的分支上提交修改')
+    process.exit(0)
+  }
+
   const { ciType } = await prompt({ ...config.ciType, default: getField('ciType') })
   const { ciMessage } = await prompt({ ...config.ciMessage, default: getField('ciMessage') })
   spinner.start('提交当前分支')
@@ -58,11 +67,18 @@ export const commit = async (branch?: string) => {
   // commitResult[0] 为当前分支
   // commitResult[1] 为commit_id
   spinner.succeed(`提交完成[${commitResult[1]}]\n  ${commitMessageCommand.match(/"(.*)"/)[1]}`)
+  setProjectScript(project, { ciType, ciMessage }, cache)
+
+  const needPr = prFileChanges && branch && currentBr !== branch && prBrList.includes(branch)
+  if (needPr) {
+    spinner.info('当前改动需要提交 pull request 合并分支.')
+    await openBrowser()
+    process.exit(0)
+  }
 
   const mainBrList = getField('mainBrList')
   const isNeedBuild: boolean = await needBuild(branch || currentBr, getField)
-  // 将操作记录写入缓存
-  setProjectScript(project, { ciType, ciMessage, isNeedBuild }, cache)
+  setProjectScript(project, { isNeedBuild }, cache)
 
   const doPush = (needCheck: boolean) => { pushCommit(needCheck, isNeedBuild, currentBr, branch, commitResult[1]) }
   if (branch && currentBr !== branch) {
@@ -75,6 +91,7 @@ export const commit = async (branch?: string) => {
 }
 
 export const cherryPick = async (commitEndId: string, branch: string, commitStartId?: string) => {
+  const project = getProjectRoot()
   await isBranchExist(branch)
 
   const hasChanges: boolean = await hasStaged()
@@ -107,9 +124,20 @@ export const cherryPick = async (commitEndId: string, branch: string, commitStar
     process.exit(0)
   }
 
-  const project = getProjectRoot()
   const cache = getCache()
   const getField = getScriptField(cache, project)
+
+  // 检查 commitIds 的改动是否需要 pr
+  const prBrList: string[] = getField('prBr') || []
+  if (prBrList.includes(branch)) {
+    const exist = await checkCommitIds(commitIds, getField('prFilePath'))
+    if (exist) {
+      spinner.info('当前改动需要提交 pull request 合并分支.')
+      await openBrowser()
+      process.exit(0)
+    }
+  }
+
   const isNeedBuild: boolean = await needBuild(branch || currentBr, getField)
   // checkout pull cherry-pick build push checkout
   await pushCommit(true, isNeedBuild, currentBr, branch, commitIds)

@@ -10,6 +10,8 @@ interface ConfigItem {
   master?: string,
   isNeedBuild?: boolean,
   mainBrList?: string[],
+  prFilePath?: string[],
+  prBr?: string[],
   [branch: string]: string | boolean | string[] | void
 }
 
@@ -29,6 +31,8 @@ export const defaultConfigItem: ConfigItem = {
   ciType: 'fix',
   ciMessage: '',
   isNeedBuild: false,
+  prFilePath: [],
+  prBr: [],
   mainBrList: ['master', 'develop']
 }
 

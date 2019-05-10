@@ -6,6 +6,12 @@ const { getProjectRoot } = require('./utils/util')
 const config = require('./config')
 const spinner = new Ora()
 
+const configMap = {
+  prfile: 'prFilePath',
+  prbranch: 'prBr',
+  branch: 'mainBrList'
+}
+
 interface Api {
   [x: string]: any
 }
@@ -77,41 +83,48 @@ export async function initConfig() {
   spinner.succeed('初始化配置完成. 可使用 mmp ls 查看详情')
 }
 
-export const addMainBr = async function(branch: string) {
+export const addConfig = async function(value: string, type: 'prfile' | 'prbranch' | 'branch') {
   const project = await getProjectRoot()
   const cache = await getCache()
   const getField = getScriptField(cache, project)
+  const field = configMap[type]
 
-  const mainBrList = getField('mainBrList')
-  if (!mainBrList.includes(branch)) {
-    mainBrList.push(branch)
-    setProjectScript(project, { mainBrList }, cache)
-    spinner.succeed(`新增${branch}到mainBrList成功`)
+  const fieldValue: string[] = getField(field) || []
+  if (!fieldValue.includes(value)) {
+    fieldValue.push(value)
+    setProjectScript(project, { [field]: fieldValue }, cache)
+    spinner.succeed(`新增 ${value} 到 ${field} 成功`)
   } else {
-    spinner.fail(`${branch}在mainBrList中已存在`)
+    spinner.fail(`${value} 在 ${field} 中已存在`)
   }
 }
 
-export const delMainBr = async (branch: string) => {
-  if (defaultConfigItem.mainBrList.includes(branch)) {
+export const delConfig = async (value: string, type: 'prfile' | 'prbranch' | 'branch') => {
+  const isBranch = type === 'branch'
+  if (isBranch && defaultConfigItem.mainBrList.includes(value)) {
     spinner.info('不能删除默认主分支')
     process.exit(0)
   }
 
-  // 删除主分支及其命令
+  const field = configMap[type]
   const project = await getProjectRoot()
   const cache = await getCache()
   const getField = getScriptField(cache, project)
+  const fieldValue = getField(field)
 
-  const mainBrList = getField('mainBrList')
-  const index = mainBrList.findIndex((x: string) => x === branch)
+  const index = fieldValue.findIndex((x: string) => x === value)
   if (index > -1) {
-    mainBrList.splice(index, 1)
-    delete cache.script[project][branch]
-    setProjectScript(project, { mainBrList }, cache)
-    spinner.succeed(`删除主分支 ${branch} 及其命令成功`)
+    fieldValue.splice(index, 1)
+
+    if (isBranch) {
+      // 删除主分支命令
+      delete cache.script[project][value]
+    }
+
+    setProjectScript(project, { [field]: fieldValue }, cache)
+    spinner.succeed(`从 ${field} 中删除 ${value} 成功`)
   } else {
-    spinner.fail(`${branch}不存在mainBrList中`)
+    spinner.fail(`${value} 不存在 ${field} 中`)
   }
 }
 

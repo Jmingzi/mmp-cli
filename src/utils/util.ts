@@ -4,6 +4,7 @@ const path = require('path')
 const childProcess = require('child_process')
 const boxen = require('boxen')
 const colors = require('colors/safe')
+const cmdConstant = require('./cmd-constant')
 const homePath = /^win/.test(process.platform) ? path.join('C:', process.env.HOMEPATH) : process.env.HOME
 
 interface Api {
@@ -72,8 +73,31 @@ const self = {
           result = self.getPathDir(remain)
         }
       }
+      if (result === '') {
+        console.log(colors.red('   请在项目根目录是否存在 package.json 文件'))
+        process.exit(0)
+      }
       return result
     }
+  },
+
+  async getStageFileList () {
+    const st = await self.runCmd(cmdConstant.GIT_ST)
+    const pathArr = st.toString().trim()
+      .split('\n')
+      .filter(x => /\//.test(x) && !/Your branch is ahead of/.test(x))
+      .map(x => x.replace(/\t|\n|\r|modified:\s+/g, ''))
+    return pathArr
+  },
+
+  async openBrowser() {
+    let gitUrl: string | string[] = await self.runCmd(cmdConstant.GIT_URL)
+    gitUrl = gitUrl.toString().trim()
+    const lastIndex = gitUrl.lastIndexOf('.')
+    gitUrl = gitUrl.slice(0, lastIndex).split('/')
+    const projectName = gitUrl.pop()
+    const groupName = gitUrl.pop()
+    await require('open')(`https://git.shinemo.com/projects/${groupName}/repos/${projectName}/pull-requests?create`)
   }
 }
 

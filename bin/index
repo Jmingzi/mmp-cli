@@ -20,6 +20,7 @@ program
 
 program
   .command('cp [commit_start_id] [commit_end_id] [branch]')
+  .option('-s, --single', 'cherry pick single one')
   .usage('<command> [commit_start_id] [commit_end_id] [branch]')
   .description('cherry-pick 最近20条commit范围内的提交到[branch]分支，commit_start_id 可选')
   .action((commit_start_id, commit_end_id, branch, cmd) => {
@@ -38,6 +39,11 @@ program
     }
 
     if (end && branch) {
+      if (cmd.single) {
+        // cherry-pick commitEndId
+        start = end
+      }
+
       check().then(() => {
         require('../lib/commit.js').cherryPick(end, branch, start)
       })
@@ -97,13 +103,15 @@ program
   })
 
 program
-  .command('add [branch]')
-  .usage('<command>')
-  .description('新增主分支')
-  .action((branch, cmd) => {
-    if (branch) {
+  .command('add [value]')
+  .option('-f, --file', '添加需要校验 pr 的文件路径')
+  .option('-b, --branch', '添加需要校验 pr 的分支')
+  .usage('<command> <option>')
+  .description('新增配置')
+  .action((value, cmd) => {
+    if (value) {
       check().then(() => {
-        require('../lib/init.js').addMainBr(branch)
+        require('../lib/init.js').addConfig(value, cmd.file ? 'prfile' : cmd.branch ? 'prbranch' : 'branch')
       })
     } else {
       cmd.help()
@@ -111,13 +119,16 @@ program
   })
 
 program
-  .command('del [branch]')
+  .command('del [value]')
+  .option('-f, --file', '删除需要校验 pr 的文件路径')
+  .option('-b, --branch', '删除需要校验 pr 的分支')
   .usage('<command>')
-  .description('删除主分支及其命令')
-  .action((branch, cmd) => {
-    if (branch) {
+  .description('删除配置')
+  .action((value, cmd) => {
+    if (value) {
       check().then(() => {
-        require('../lib/init.js').delMainBr(branch)
+        require('../lib/init.js').delConfig(value, cmd.file ? 'prfile' : cmd.branch ? 'prbranch' : 'branch')
+        // require('../lib/init.js').delMainBr(branch)
       })
     } else {
       cmd.help()
