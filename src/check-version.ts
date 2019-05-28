@@ -28,11 +28,18 @@ export const check = async (): Promise<void> => {
   await checkNode()
 
   spinner.start('校验 mmp 版本')
-  const { version } = await get('https://registry.npm.taobao.org/mmp-cli/latest')
+  let hasError: boolean = false
   const localVersion = await runCmd('mmp -V')
+  const { version } = await get('https://registry.npm.taobao.org/mmp-cli/latest').catch((err: Error) => {
+    spinner.fail(`校验服务异常: ${err.message}`)
+    hasError = true
+    return { version: localVersion }
+  })
   if (semver.lt(localVersion, version)) {
     noticeUpdate(localVersion.trim(), version)
   }
-  spinner.succeed('校验版本完成')
+  if (!hasError) {
+    spinner.succeed('校验版本完成')
+  }
   setCache({ ...cache, lastCheckTs: Date.now() })
 }

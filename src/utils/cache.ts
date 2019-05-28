@@ -1,7 +1,7 @@
 const fs = require('fs')
-const Ora = require('ora')
+// const Ora = require('ora')
 const { configPath, projectConfig } = require('./util')
-const spinner = new Ora()
+// const spinner = new Ora()
 
 export interface Config {
   lastCheckTs?: number
