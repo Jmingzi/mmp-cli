@@ -3,35 +3,37 @@ const fs = require('fs')
 const { configPath, projectConfig } = require('./util')
 // const spinner = new Ora()
 
-export interface Config {
-  lastCheckTs?: number
+interface ConfigItem {
   ciType: string
   ciMessage: string
-  develop?: string
-  master?: string
   isNeedBuild: boolean
-  mainBrList: string[]
-  prFilePath: string[]
-  prBr: string[]
-  // [branch: string]: string | boolean | string[] | void
 }
 
-// interface Config {
-//   lastCheckTs: number,
-//   script: {
-//     [project: string]: ConfigItem
-//   }
-// }
+export interface Config {
+  lastCheckTs: number
+  [name: string]: ConfigItem | number
+}
 
-// export const defaultConfig: Config = {
-//   lastCheckTs: 0,
-//   script: {}
-// }
+export interface ConfigLocal {
+  prFilePath: string[]
+  prBr: string[]
+  develop?: string
+  master?: string
+  mainBrList: string[]
+}
 
-export const defaultConfig: Config = {
+interface Cache {
+  localConfig: ConfigLocal,
+  config: Config
+}
+
+export const defaultConfigItem: ConfigItem = {
   ciType: 'fix',
   ciMessage: '',
-  isNeedBuild: false,
+  isNeedBuild: false
+}
+
+export const defaultLocalConfig: ConfigLocal = {
   prFilePath: [],
   prBr: [],
   mainBrList: ['master', 'develop']
@@ -42,30 +44,44 @@ export const getProjectConfigPath = () => {
   return projectConfigPath || `${projectConfig()}/.mmprc.json`
 }
 
-export const setCache = (fullObj: Config) => {
-  fs.writeFileSync(getProjectConfigPath(), JSON.stringify(fullObj, null, 2))
+export const setCache = (isLocal: boolean = true, fullObj: ConfigLocal | Config) => {
+  fs.writeFileSync(
+    isLocal ? getProjectConfigPath() : configPath,
+    JSON.stringify(fullObj, null, 2)
+  )
 }
 
-export const getCache = (): Config => {
+export const getCache = (project: string): Cache => {
+  let localConfig
+  let config
   try {
-    const res = fs.readFileSync(getProjectConfigPath(), 'utf8')
-    return JSON.parse(res)
+    localConfig = JSON.parse(fs.readFileSync(getProjectConfigPath(), 'utf8'))
   } catch (e) {
-    setCache(defaultConfig)
-    return defaultConfig
+    setCache(true, defaultLocalConfig)
+    localConfig = defaultLocalConfig
   }
-  // try {
-  //   const res = fs.readFileSync(getProjectConfigPath(), 'utf8')
-  //   return res ? JSON.parse(res) : null
-  // } catch (e) {
-  //   // 创建配置文件
-  //   setCache(defaultConfig)
-  //   return defaultConfig
-  // }
+  try {
+    config = JSON.parse(fs.readFileSync(configPath, 'utf8'))
+  } catch (e) {
+    const tmp = { lastCheckTs: 0, [project]: defaultConfigItem }
+    setCache(false, tmp)
+    config = tmp
+  }
+  return {
+    localConfig,
+    config
+  }
 }
 
-export const setProjectScript = (obj: Config): void => {
-  setCache({ ...getCache(), ...obj })
+export const setProjectScript = (project: string, isLocal: boolean, obj: Config): void => {
+  const { config, localConfig } = getCache(project)
+  if (isLocal) {
+    setCache(true, { ...localConfig, ...obj })
+  } else {
+    // @ts-ignore
+    config[project] = { ...config[project], ...obj }
+    setCache(false, config)
+  }
 }
 
 // export const getScriptField = (field: string, fullObj?: Config) => {

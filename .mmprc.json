@@ -1,15 +1,8 @@
 {
-  "ciType": "fix",
-  "ciMessage": "isNeedBuild",
-  "isNeedBuild": true,
   "prFilePath": [],
-  "prBr": [
-    "mmm"
-  ],
+  "prBr": [],
   "mainBrList": [
     "master",
     "develop"
-  ],
-  "lastCheckTs": 1559015313956,
-  "master": "npm run build"
+  ]
 }

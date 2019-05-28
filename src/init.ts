@@ -35,8 +35,8 @@ async function notice(name: string, brCmd?: string) {
 }
 
 export async function initSingleBr(currentBr: string): Promise<string> {
-  // let cache = getCache()
-  // const project = getProjectRoot()
+  const project = getProjectRoot()
+  // const { config, localConfig } = getCache(project)
 
   // 当前项目配置文件不存在
   // if (cache.script && !cache.script[project]) {
@@ -45,13 +45,13 @@ export async function initSingleBr(currentBr: string): Promise<string> {
   // }
 
   const cmd = await notice(currentBr)
-  setProjectScript({ [currentBr]: cmd })
+  setProjectScript(project,true,{ [currentBr]: cmd })
   return cmd
 }
 
 export async function initConfig() {
-  let cache = getCache()
-  // const project = getProjectRoot()
+  const project = getProjectRoot()
+  const cache = getCache(project)
 
   // 当前项目配置文件不存在
   // if (cache.script && !cache.script[project]) {
@@ -63,7 +63,7 @@ export async function initConfig() {
   // const mainBrList = getField('mainBrList')
   const { scriptBranch } = await prompt({
     ...config.scriptBranch,
-    default: cache.mainBrList instanceof Array ? cache.mainBrList.join(' ') : defaultConfig.mainBrList
+    default: cache.localConfig.mainBrList instanceof Array ? cache.localConfig.mainBrList.join(' ') : defaultConfig.mainBrList
   })
 
   // 需要构建主分支所有的命令
@@ -79,20 +79,20 @@ export async function initConfig() {
   }
   await doNotice(mainBrArr[i])
 
-  setProjectScript({ ...mainBrScriptMap, mainBrList: mainBrArr })
+  setProjectScript(project, true, { ...mainBrScriptMap, mainBrList: mainBrArr })
   spinner.succeed('初始化配置完成. 可使用 mmp ls 查看详情')
 }
 
 export const addConfig = async function(value: string, type: 'prfile' | 'prbranch' | 'branch') {
-  // const project = await getProjectRoot()
-  const cache = await getCache()
+  const project = await getProjectRoot()
+  const cache = await getCache(project)
   // const getField = getScriptField(cache, project)
   const field = configMap[type]
 
-  const fieldValue: string[] = cache[field] || []
+  const fieldValue: string[] = cache.localConfig[field] || []
   if (!fieldValue.includes(value)) {
     fieldValue.push(value)
-    setProjectScript({ [field]: fieldValue })
+    setProjectScript(project, true,{ [field]: fieldValue })
     spinner.succeed(`新增 ${value} 到 ${field} 成功`)
   } else {
     spinner.fail(`${value} 在 ${field} 中已存在`)

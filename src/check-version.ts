@@ -17,10 +17,10 @@ export const checkNode = async (): Promise<void> => {
 }
 
 export const check = async (): Promise<void> => {
-  const cache = getCache()
+  const { config } = getCache()
   if (
-  	cache.lastCheckTs &&
-  	Date.now() - cache.lastCheckTs <= 60 * 60 * 1000 * 6
+    config.lastCheckTs &&
+  	Date.now() - config.lastCheckTs <= 60 * 60 * 1000 * 6
   ) {
     // console.log(colors.grey('\n   版本更新校验缓存 6 小时\n'))
   	return Promise.resolve()
@@ -41,5 +41,5 @@ export const check = async (): Promise<void> => {
   if (!hasError) {
     spinner.succeed('校验版本完成')
   }
-  setCache({ ...cache, lastCheckTs: Date.now() })
+  setCache(false,{ ...config, lastCheckTs: Date.now() })
 }
