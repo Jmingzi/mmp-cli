@@ -65,6 +65,7 @@ export const getCache = (): Config => {
 }
 
 export const setProjectScript = (obj: Config, fullObj: Config): void => {
+  console.log(obj)
   setCache({ ...fullObj, ...obj })
 }
 
