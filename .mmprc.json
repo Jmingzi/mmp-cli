@@ -1,6 +1,6 @@
 {
   "ciType": "fix",
-  "ciMessage": "cache",
+  "ciMessage": "配置文件提交",
   "isNeedBuild": false,
   "prFilePath": [],
   "prBr": [],

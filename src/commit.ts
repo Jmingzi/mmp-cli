@@ -62,14 +62,15 @@ export const commit = async (branch?: string) => {
 
   const { ciType } = await prompt({ ...config.ciType, default: cache.ciType })
   const { ciMessage } = await prompt({ ...config.ciMessage, default: cache.ciMessage })
+  setProjectScript({ ciType, ciMessage })
   spinner.start('提交当前分支')
+
   const commitMessageCommand = cmd.gitCi(ciType, ciMessage, currentBr)
   let commitResult = await runCmd([cmd.GIT_ADD, commitMessageCommand])
   commitResult = commitResult.match(/\[(.*)\]/)[1].split(' ')
   // commitResult[0] 为当前分支
   // commitResult[1] 为commit_id
   spinner.succeed(`提交完成[${commitResult[1]}]\n  ${commitMessageCommand.match(/"(.*)"/)[1]}`)
-  setProjectScript({ ciType, ciMessage })
 
   const needPr = prFileChanges && branch && currentBr !== branch && prBrList.includes(branch)
   if (needPr) {
@@ -80,10 +81,10 @@ export const commit = async (branch?: string) => {
 
   // const mainBrList = getField('mainBrList')
   const isNeedBuild: boolean = await needBuild(branch || currentBr, cache)
-  setProjectScript({ isNeedBuild })
-
   const doPush = (needCheck: boolean) => { pushCommit(needCheck, isNeedBuild, currentBr, branch, commitResult[1]) }
   if (branch && currentBr !== branch) {
+    // 为了使改动的配置文件被提交
+    setProjectScript({ isNeedBuild })
     // checkout pull cherry-pick build push checkout
     doPush(true)
   } else if (cache.mainBrList.includes(currentBr)) {
