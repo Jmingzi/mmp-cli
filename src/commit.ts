@@ -80,7 +80,7 @@ export const commit = async (branch?: string) => {
 
   const isNeedBuild: boolean = await needBuild(
     branch || currentBr,
-    config[project].isNeedBuild,
+    config[project] && config[project].isNeedBuild,
     localConfig.mainBrList
   )
   setProjectScript(project, false,{ isNeedBuild })
