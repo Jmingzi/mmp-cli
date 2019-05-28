@@ -33,7 +33,7 @@ async function needBuild (branch: string, build: boolean, mainBrList: Array<stri
 }
 
 export const commit = async (branch?: string) => {
-  const project = getProjectRoot()
+  getProjectRoot()
   if (branch) {
     // 检查branch是否存在
     await isBranchExist(branch)
@@ -47,7 +47,7 @@ export const commit = async (branch?: string) => {
     process.exit(0)
   }
 
-  const { config, localConfig } = getCache(project)
+  const { config, localConfig } = getCache()
   const prFileChanges = await checkPrFileChanges(localConfig.prFilePath)
   const prBrList: Array<string> = localConfig.prBr
 
@@ -60,7 +60,7 @@ export const commit = async (branch?: string) => {
   const { ciType } = await prompt({ ...conf.ciType, default: config.ciType })
   const { ciMessage } = await prompt({ ...conf.ciMessage, default: config.ciMessage })
   // 为了使改动的配置文件被提交
-  setProjectScript(project, false,{ ciType, ciMessage })
+  setProjectScript(false,{ ciType, ciMessage })
   spinner.start('提交当前分支')
 
   const commitMessageCommand = cmd.gitCi(ciType, ciMessage, currentBr)
@@ -80,10 +80,10 @@ export const commit = async (branch?: string) => {
 
   const isNeedBuild: boolean = await needBuild(
     branch || currentBr,
-    config[project] && config[project].isNeedBuild,
+    config.isNeedBuild,
     localConfig.mainBrList
   )
-  setProjectScript(project, false,{ isNeedBuild })
+  setProjectScript(false,{ isNeedBuild })
   const doPush = (needCheck: boolean) => { pushCommit(needCheck, isNeedBuild, currentBr, branch, commitResult[1]) }
   if (branch && currentBr !== branch) {
     // checkout pull cherry-pick build push checkout
@@ -95,7 +95,7 @@ export const commit = async (branch?: string) => {
 }
 
 export const cherryPick = async (commitEndId: string, branch: string, commitStartId?: string) => {
-  const project = getProjectRoot()
+  getProjectRoot()
   await isBranchExist(branch)
 
   const hasChanges: boolean = await hasStaged()
@@ -128,7 +128,7 @@ export const cherryPick = async (commitEndId: string, branch: string, commitStar
     process.exit(0)
   }
 
-  const { config, localConfig } = getCache(project)
+  const { config, localConfig } = getCache()
   // const getField = getScriptField(cache, project)
 
   // 检查 commitIds 的改动是否需要 pr
@@ -148,7 +148,7 @@ export const cherryPick = async (commitEndId: string, branch: string, commitStar
     config.isNeedBuild,
     localConfig.mainBrList
   )
-  setProjectScript(project, false,{ isNeedBuild })
+  setProjectScript(false,{ isNeedBuild })
   // checkout pull cherry-pick build push checkout
   await pushCommit(true, isNeedBuild, currentBr, branch, commitIds)
 }

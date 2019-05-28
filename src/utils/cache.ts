@@ -3,15 +3,17 @@ const fs = require('fs')
 const { configPath, projectConfig } = require('./util')
 // const spinner = new Ora()
 
-interface ConfigItem {
-  ciType: string
-  ciMessage: string
-  isNeedBuild: boolean
-}
+// interface ConfigItem {
+//   ciType: string
+//   ciMessage: string
+//   isNeedBuild: boolean
+// }
 
 export interface Config {
   lastCheckTs: number
-  [name: string]: ConfigItem | number
+  ciType: string
+  ciMessage: string
+  isNeedBuild: boolean
 }
 
 export interface ConfigLocal {
@@ -27,7 +29,8 @@ interface Cache {
   config: Config
 }
 
-export const defaultConfigItem: ConfigItem = {
+export const defaultConfig: Config = {
+  lastCheckTs: 0,
   ciType: 'fix',
   ciMessage: '',
   isNeedBuild: false
@@ -51,7 +54,7 @@ export const setCache = (isLocal: boolean = true, fullObj: ConfigLocal | Config)
   )
 }
 
-export const getCache = (project: string): Cache => {
+export const getCache = (): Cache => {
   let localConfig
   let config
   try {
@@ -63,9 +66,8 @@ export const getCache = (project: string): Cache => {
   try {
     config = JSON.parse(fs.readFileSync(configPath, 'utf8'))
   } catch (e) {
-    const tmp = { lastCheckTs: 0, [project]: defaultConfigItem }
-    setCache(false, tmp)
-    config = tmp
+    setCache(false, defaultConfig)
+    config = defaultConfig
   }
   return {
     localConfig,
@@ -73,14 +75,12 @@ export const getCache = (project: string): Cache => {
   }
 }
 
-export const setProjectScript = (project: string, isLocal: boolean, obj: Config): void => {
-  const { config, localConfig } = getCache(project)
+export const setProjectScript = (isLocal: boolean, obj: Config): void => {
+  const { config, localConfig } = getCache()
   if (isLocal) {
     setCache(true, { ...localConfig, ...obj })
   } else {
-    // @ts-ignore
-    config[project] = { ...config[project], ...obj }
-    setCache(false, config)
+    setCache(false, { ...config, ...obj })
   }
 }
 
