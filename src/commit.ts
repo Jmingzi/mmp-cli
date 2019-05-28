@@ -28,7 +28,7 @@ async function needBuild (branch: string, cache: Config) {
   if (cache.mainBrList.includes(branch)) {
     // 目标分支存在且为主分支
     // 目标分支不存在，当前分支为主分支
-    const buildQuaRes = await prompt({ ...config.needBuild, default: cache.isNeedBuild })
+    const buildQuaRes = await prompt({ ...config.needBuild(cache.isNeedBuild), default: cache.isNeedBuild })
     isNeedBuild = buildQuaRes.isNeedBuild
   }
   return isNeedBuild
