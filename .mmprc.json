@@ -1,7 +1,7 @@
 {
   "ciType": "fix",
-  "ciMessage": "将打包命令前置；为了提交配置信息的改动",
-  "isNeedBuild": false,
+  "ciMessage": "isNeedBuild",
+  "isNeedBuild": true,
   "prFilePath": [],
   "prBr": [
     "mmm"
@@ -10,5 +10,6 @@
     "master",
     "develop"
   ],
-  "lastCheckTs": 1559015313956
+  "lastCheckTs": 1559015313956,
+  "master": "npm run build"
 }

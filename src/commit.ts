@@ -24,7 +24,7 @@ async function isBranchExist (branch: string): Promise<void> {
 
 async function needBuild (branch: string, cache: Config) {
   // const mainBrList = getField('mainBrList')
-  let isNeedBuild: boolean = false
+  let isNeedBuild: boolean = cache.isNeedBuild
   if (cache.mainBrList.includes(branch)) {
     // 目标分支存在且为主分支
     // 目标分支不存在，当前分支为主分支
