@@ -35,7 +35,6 @@ async function needBuild (branch: string, cache: Config) {
 }
 
 export const commit = async (branch?: string) => {
-  // const project = getProjectRoot()
   if (branch) {
     // 检查branch是否存在
     await isBranchExist(branch)
@@ -50,7 +49,6 @@ export const commit = async (branch?: string) => {
   }
 
   const cache = getCache()
-  // const getField = getScriptField(cache, project)
   const prFileChanges = await checkPrFileChanges(cache.prFilePath)
   const prBrList: Array<string> = cache.prBr
 
@@ -62,7 +60,9 @@ export const commit = async (branch?: string) => {
 
   const { ciType } = await prompt({ ...config.ciType, default: cache.ciType })
   const { ciMessage } = await prompt({ ...config.ciMessage, default: cache.ciMessage })
-  setProjectScript({ ciType, ciMessage })
+  // 为了使改动的配置文件被提交
+  const isNeedBuild: boolean = await needBuild(branch || currentBr, cache)
+  setProjectScript({ ciType, ciMessage, isNeedBuild })
   spinner.start('提交当前分支')
 
   const commitMessageCommand = cmd.gitCi(ciType, ciMessage, currentBr)
@@ -80,12 +80,8 @@ export const commit = async (branch?: string) => {
     process.exit(0)
   }
 
-  // const mainBrList = getField('mainBrList')
-  const isNeedBuild: boolean = await needBuild(branch || currentBr, cache)
   const doPush = (needCheck: boolean) => { pushCommit(needCheck, isNeedBuild, currentBr, branch, commitResult[1]) }
   if (branch && currentBr !== branch) {
-    // 为了使改动的配置文件被提交
-    setProjectScript({ isNeedBuild })
     // checkout pull cherry-pick build push checkout
     doPush(true)
   } else if (cache.mainBrList.includes(currentBr)) {

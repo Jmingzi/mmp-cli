@@ -1,6 +1,6 @@
 {
-  "ciType": "debug",
-  "ciMessage": "commit",
+  "ciType": "fix",
+  "ciMessage": "将打包命令前置；为了提交配置信息的改动",
   "isNeedBuild": false,
   "prFilePath": [],
   "prBr": [
