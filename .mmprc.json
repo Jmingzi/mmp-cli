@@ -4,5 +4,6 @@
   "mainBrList": [
     "master",
     "develop"
-  ]
+  ],
+  "master": "npm run build"
 }
