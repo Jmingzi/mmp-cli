@@ -1,9 +1,11 @@
 {
-  "ciType": "fix",
-  "ciMessage": "配置文件提交",
+  "ciType": "debug",
+  "ciMessage": "commit",
   "isNeedBuild": false,
   "prFilePath": [],
-  "prBr": [],
+  "prBr": [
+    "mmm"
+  ],
   "mainBrList": [
     "master",
     "develop"

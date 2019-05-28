@@ -1,7 +1,7 @@
 const Ora = require('ora')
 const prompt = require('inquirer').createPromptModule()
 
-const { setCache, getCache, setProjectScript, getScriptField, defaultConfigItem } = require('./utils/cache')
+const { setCache, getCache, setProjectScript, defaultConfig } = require('./utils/cache')
 const { getProjectRoot } = require('./utils/util')
 const config = require('./config')
 const spinner = new Ora()
@@ -35,35 +35,35 @@ async function notice(name: string, brCmd?: string) {
 }
 
 export async function initSingleBr(currentBr: string): Promise<string> {
-  let cache = getCache()
-  const project = getProjectRoot()
+  // let cache = getCache()
+  // const project = getProjectRoot()
 
   // 当前项目配置文件不存在
-  if (cache.script && !cache.script[project]) {
-    setProjectScript(project, defaultConfigItem, cache)
-    cache = getCache()
-  }
+  // if (cache.script && !cache.script[project]) {
+  //   setProjectScript(project, defaultConfigItem, cache)
+  //   cache = getCache()
+  // }
 
   const cmd = await notice(currentBr)
-  setProjectScript(project, { [currentBr]: cmd }, cache)
+  setProjectScript({ [currentBr]: cmd })
   return cmd
 }
 
 export async function initConfig() {
   let cache = getCache()
-  const project = getProjectRoot()
+  // const project = getProjectRoot()
 
   // 当前项目配置文件不存在
-  if (cache.script && !cache.script[project]) {
-    setProjectScript(project, defaultConfigItem, cache)
-    cache = getCache()
-  }
+  // if (cache.script && !cache.script[project]) {
+  //   setProjectScript(project, defaultConfigItem, cache)
+  //   cache = getCache()
+  // }
 
-  const getField = getScriptField(cache, project)
-  const mainBrList = getField('mainBrList')
+  // const getField = getScriptField(cache, project)
+  // const mainBrList = getField('mainBrList')
   const { scriptBranch } = await prompt({
     ...config.scriptBranch,
-    default: mainBrList instanceof Array ? mainBrList.join(' ') : defaultConfigItem.mainBrList
+    default: cache.mainBrList instanceof Array ? cache.mainBrList.join(' ') : defaultConfig.mainBrList
   })
 
   // 需要构建主分支所有的命令
@@ -71,7 +71,7 @@ export async function initConfig() {
   const mainBrScriptMap: Api = {}
   let i = 0
   async function doNotice(name: string) {
-    mainBrScriptMap[name] = await notice(name, getField(name))
+    mainBrScriptMap[name] = await notice(name, cache[name])
     i ++
     if (i < mainBrArr.length) {
       await doNotice(mainBrArr[i])
@@ -79,20 +79,20 @@ export async function initConfig() {
   }
   await doNotice(mainBrArr[i])
 
-  setProjectScript(project, { ...mainBrScriptMap, mainBrList: mainBrArr }, cache)
+  setProjectScript({ ...mainBrScriptMap, mainBrList: mainBrArr })
   spinner.succeed('初始化配置完成. 可使用 mmp ls 查看详情')
 }
 
 export const addConfig = async function(value: string, type: 'prfile' | 'prbranch' | 'branch') {
-  const project = await getProjectRoot()
+  // const project = await getProjectRoot()
   const cache = await getCache()
-  const getField = getScriptField(cache, project)
+  // const getField = getScriptField(cache, project)
   const field = configMap[type]
 
-  const fieldValue: string[] = getField(field) || []
+  const fieldValue: string[] = cache[field] || []
   if (!fieldValue.includes(value)) {
     fieldValue.push(value)
-    setProjectScript(project, { [field]: fieldValue }, cache)
+    setProjectScript({ [field]: fieldValue })
     spinner.succeed(`新增 ${value} 到 ${field} 成功`)
   } else {
     spinner.fail(`${value} 在 ${field} 中已存在`)
@@ -101,16 +101,16 @@ export const addConfig = async function(value: string, type: 'prfile' | 'prbranc
 
 export const delConfig = async (value: string, type: 'prfile' | 'prbranch' | 'branch') => {
   const isBranch = type === 'branch'
-  if (isBranch && defaultConfigItem.mainBrList.includes(value)) {
+  if (isBranch && defaultConfig.mainBrList.includes(value)) {
     spinner.info('不能删除默认主分支')
     process.exit(0)
   }
 
   const field = configMap[type]
-  const project = await getProjectRoot()
+  // const project = await getProjectRoot()
   const cache = await getCache()
-  const getField = getScriptField(cache, project)
-  const fieldValue = getField(field)
+  // const getField = getScriptField(cache, project)
+  const fieldValue = cache[field]
 
   const index = fieldValue.findIndex((x: string) => x === value)
   if (index > -1) {
@@ -118,10 +118,10 @@ export const delConfig = async (value: string, type: 'prfile' | 'prbranch' | 'br
 
     if (isBranch) {
       // 删除主分支命令
-      delete cache.script[project][value]
+      delete cache[value]
     }
 
-    setProjectScript(project, { [field]: fieldValue }, cache)
+    setProjectScript({ [field]: fieldValue })
     spinner.succeed(`从 ${field} 中删除 ${value} 成功`)
   } else {
     spinner.fail(`${value} 不存在 ${field} 中`)
@@ -138,28 +138,28 @@ export const delProject = async () => {
 }
 
 export const ls = async () => {
-  const projectName = await getProjectRoot()
+  // const projectName = await getProjectRoot()
   const cache = await getCache()
-  const result = cache.script && cache.script[projectName]
-  if (result) {
-    console.log(JSON.stringify(result, null, 2))
+  // const result = cache.script && cache.script[projectName]
+  if (cache) {
+    console.log(JSON.stringify(cache, null, 2))
   } else {
     spinner.info('项目配置未初始化，执行 mmp init.')
   }
 }
 
 export const setBrCmd = async function(branch: string, cmd_value: string) {
-  const project = await getProjectRoot()
+  // const project = await getProjectRoot()
   const cache = await getCache()
-  const getField = getScriptField(cache, project)
+  // const getField = getScriptField(cache, project)
 
-  const mainBrList = getField('mainBrList')
+  // const mainBrList = getField('mainBrList')
   // 校验branch是否存在于本地分支列表
-  if (!mainBrList.includes(branch)) {
+  if (!cache.mainBrList.includes(branch)) {
     spinner.fail(`${branch}不存在本项目的主分支列表中`)
     process.exit(0)
   }
 
-  setProjectScript(project, { [branch]: cmd_value }, cache)
+  setProjectScript({ [branch]: cmd_value })
   spinner.succeed(`设置 ${branch}=${cmd_value} 成功`)
 }

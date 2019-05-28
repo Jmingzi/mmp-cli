@@ -76,6 +76,7 @@ export const commit = async (branch?: string) => {
   if (needPr) {
     spinner.info('当前改动需要提交 pull request 合并分支.')
     await openBrowser()
+    await push(currentBr)
     process.exit(0)
   }
 

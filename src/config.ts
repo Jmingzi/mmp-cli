@@ -79,9 +79,9 @@ module.exports = {
     name: 'initRepeat',
     message: '配置已存在，是否修改？'
   },
-  needBuild: {
+  needBuild: (defaultConf: boolean = true) => ({
     type: 'confirm',
     name: 'isNeedBuild',
-    message: '是否需要打包？'
-  }
+    message: `是否需要打包？(${defaultConf ? 'Yes' : 'No'})`
+  })
 }

@@ -3,8 +3,8 @@ const path = require('path')
 const childProcess = require('child_process')
 
 const cmd = require('./utils/cmd-constant')
-const { getProjectRoot, runCmd } = require('./utils/util')
-const { getCache, getScriptField } = require('./utils/cache')
+const { runCmd } = require('./utils/util')
+const { getCache } = require('./utils/cache')
 const { getCurrentBr, hasStaged } = require('./utils/git')
 const { initSingleBr } = require('./init')
 const spinner = new Ora()
@@ -12,20 +12,20 @@ const spinner = new Ora()
 import { SpawnResult } from './utils/build-script'
 
 const build = async (buildImmediate?: boolean) => {
-  const project = getProjectRoot()
+  // const project = getProjectRoot()
   const cache = getCache()
-  const getField = getScriptField(cache, project)
+  // const getField = getScriptField(cache, project)
   const currentBr = await getCurrentBr()
 
   // 非主分支不能打包
-  const mainBrList = getField('mainBrList')
-  if (!mainBrList.includes(currentBr)) {
+  // const mainBrList = getField('mainBrList')
+  if (!cache.mainBrList.includes(currentBr)) {
     spinner.fail(`当前分支 ${currentBr} 不是主分支，不能执行打包命令`)
     process.exit(0)
   }
 
   // 校验配置是否存在
-  let buildCmd = getField(currentBr)
+  let buildCmd = cache[currentBr]
   if (!buildCmd) {
     spinner.info('当前分支还没有配置打包命令')
     buildCmd = await initSingleBr(currentBr)
