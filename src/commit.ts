@@ -2,8 +2,8 @@
 const Ora = require('ora')
 const prompt = require('inquirer').createPromptModule()
 
-const { getProjectRoot, runCmd, openBrowser } = require('./utils/util')
-const { getCache, getScriptField, setProjectScript } = require('./utils/cache')
+const { runCmd, openBrowser } = require('./utils/util')
+const { getCache, setProjectScript } = require('./utils/cache')
 const { getCommitIdLog, getBr, hasStaged, getCurrentBr, pull, push, cherryPickCommit, checkout } = require('./utils/git')
 const { checkPrFileChanges, checkCommitIds } = require('./pr')
 const cmd = require('./utils/cmd-constant')
@@ -69,7 +69,7 @@ export const commit = async (branch?: string) => {
   // commitResult[0] 为当前分支
   // commitResult[1] 为commit_id
   spinner.succeed(`提交完成[${commitResult[1]}]\n  ${commitMessageCommand.match(/"(.*)"/)[1]}`)
-  setProjectScript({ ciType, ciMessage }, cache)
+  setProjectScript({ ciType, ciMessage })
 
   const needPr = prFileChanges && branch && currentBr !== branch && prBrList.includes(branch)
   if (needPr) {
@@ -80,7 +80,7 @@ export const commit = async (branch?: string) => {
 
   // const mainBrList = getField('mainBrList')
   const isNeedBuild: boolean = await needBuild(branch || currentBr, cache)
-  setProjectScript({ isNeedBuild }, cache)
+  setProjectScript({ isNeedBuild })
 
   const doPush = (needCheck: boolean) => { pushCommit(needCheck, isNeedBuild, currentBr, branch, commitResult[1]) }
   if (branch && currentBr !== branch) {
