@@ -37,9 +37,12 @@ export const pull = async (isRebase: boolean = true) => {
   spinner.succeed(/up to date/.test(pullRes) ? '远程仓库无更新' : '远程仓库有更新，已拉取到本地')
 }
 
-export const push = async () => {
+export const push = async (branch?: string) => {
   spinner.start('推送到远程')
-  await runCmd(cmdConstant.GIT_PUSH).catch((err: Error) => {
+  await runCmd(branch
+    ? `${cmdConstant.GIT_PUSH} -u origin ${branch}`
+    : cmdConstant.GIT_PUSH
+  ).catch((err: Error) => {
     console.log('\n' + err)
     spinner.fail(`推送失败`)
     process.exit(0)

@@ -81,6 +81,13 @@ const self = {
     }
   },
 
+  projectConfig() {
+    const cwd = process.cwd()
+    const rootName = self.getProjectRoot()
+    const i = cwd.lastIndexOf(rootName)
+    return cwd.substr(0, i + rootName.length)
+  },
+
   async getStageFileList () {
     const st = await self.runCmd(cmdConstant.GIT_ST)
     const pathArr = st.toString().trim()

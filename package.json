@@ -33,6 +33,7 @@
     "inquirer": "^6.2.0",
     "open": "^6.2.0",
     "ora": "^3.0.0",
+    "rc": "^1.2.8",
     "semver": "^6.0.0"
   },
   "devDependencies": {

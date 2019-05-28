@@ -1,0 +1,12 @@
+{
+  "ciType": "fix",
+  "ciMessage": "",
+  "isNeedBuild": false,
+  "prFilePath": [],
+  "prBr": [],
+  "mainBrList": [
+    "master",
+    "develop"
+  ],
+  "lastCheckTs": 1559014458984
+}

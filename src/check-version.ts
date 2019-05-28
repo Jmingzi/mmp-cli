@@ -20,9 +20,9 @@ export const check = async (): Promise<void> => {
   const cache = getCache()
   if (
   	cache.lastCheckTs &&
-  	Date.now() - cache.lastCheckTs <= 60 * 60 * 1000
+  	Date.now() - cache.lastCheckTs <= 60 * 60 * 1000 * 6
   ) {
-    // console.log(colors.grey('\n   版本更新校验缓存 1 小时\n'))
+    // console.log(colors.grey('\n   版本更新校验缓存 6 小时\n'))
   	return Promise.resolve()
   }
   await checkNode()
