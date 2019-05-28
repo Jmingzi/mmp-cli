@@ -35,7 +35,7 @@ async function notice(name: string, brCmd?: string) {
 }
 
 export async function initSingleBr(currentBr: string): Promise<string> {
-  const project = getProjectRoot()
+  getProjectRoot()
   // const { config, localConfig } = getCache(project)
 
   // 当前项目配置文件不存在
@@ -45,7 +45,7 @@ export async function initSingleBr(currentBr: string): Promise<string> {
   // }
 
   const cmd = await notice(currentBr)
-  setProjectScript(project,true,{ [currentBr]: cmd })
+  setProjectScript(true,{ [currentBr]: cmd })
   return cmd
 }
 
