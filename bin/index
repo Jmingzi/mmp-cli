@@ -148,15 +148,16 @@ program
     }
   })
 
-program
-  .command('delp')
-  .usage('<command>')
-  .description('删除项目配置')
-  .action(() => {
-    check().then(() => {
-      require('../lib/init.js').delProject()
-    })
-  })
+// TODO
+// program
+//   .command('cp-continue')
+//   .usage('<command>')
+//   .description('删除项目配置')
+//   .action(() => {
+//     check().then(() => {
+//       require('../lib/init.js').delProject()
+//     })
+//   })
 
 // output help information on unknown commands
 program
